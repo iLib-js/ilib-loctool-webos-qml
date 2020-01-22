@@ -33,7 +33,7 @@ var p = new CustomProject({
 
 var qmlft = new QMLFileType(p);
 
-module.exports.cfile = {
+module.exports.qmlfile = {
     testQMLFileConstructor: function(test) {
         test.expect(1);
 
@@ -388,7 +388,7 @@ module.exports.cfile = {
     },
 
     testQMLFileParseMultiple3: function(test) {
-        test.expect(17:q);
+        test.expect(17);
 
         var qf = new QMLFile({
             project: p,
@@ -400,7 +400,7 @@ module.exports.cfile = {
         qf.parse('var guideText = qsTr("Music Recording Settings") + " , " + qsTr("Cancel") + " " + qsTr("Music Record") + " , " + qsTr("Music Record") + " " + qsTr("button") + " , " + qsTr("Press Down button on remote to set details for music recording.");');
 
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 4);
+        test.equal(set.size(), 5);
 
 
         var r = set.getBySource("Music Recording Settings");
@@ -538,7 +538,7 @@ module.exports.cfile = {
         test.done();
     },
 
-    testQMLFileExtractFile: function(test) {
+    /*testQMLFileExtractFile: function(test) {
         test.expect(14);
 
         var qf = new QMLFile({
@@ -581,7 +581,7 @@ module.exports.cfile = {
 
         test.done();
     },
-
+*/
     testQMLFileExtractUndefinedFile: function(test) {
         test.expect(2);
 
@@ -599,7 +599,7 @@ module.exports.cfile = {
         test.equal(set.size(), 0);
         test.done();
     },
-    testQMLFileTest2: function(test) {
+    /*testQMLFileTest2: function(test) {
         test.expect(14);
 
         var qf = new QMLFile({
@@ -634,7 +634,7 @@ module.exports.cfile = {
         test.equal(r.getKey(), "hi\n\t\t there \vwelcome");
 
         test.done();
-    },
+    },*/
     testQMLFileTest3: function(test) {
         test.expect(2);
 
@@ -649,6 +649,56 @@ module.exports.cfile = {
 
         var set = qf.getTranslationSet();
         test.equal(set.size(), 0);
+
+        test.done();
+    },
+    testQMLFileParseMacro: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse(' QT_TR_NOOP("Goodbye")');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBy({
+            reskey: "Goodbye"
+        });
+        test.ok(r);
+
+        test.equal(r[0].getSource(), "Goodbye");
+        test.equal(r[0].getKey(), "Goodbye");
+
+        test.done();
+    },
+    testQMLFileParseMacro2: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('QT_TR_N_NOOP("There are %n new message(s)")');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBy({
+            reskey: "There are %n new message(s)"
+        });
+        test.ok(r);
+
+        test.equal(r[0].getSource(), "There are %n new message(s)");
+        test.equal(r[0].getKey(), "There are %n new message(s)");
 
         test.done();
     }

@@ -30,7 +30,7 @@ var p = new CustomProject({
     locales:["en-GB"]
 });
 
-module.exports.cfiletype = {
+module.exports.qmlfiletype = {
     testQMLFileTypeConstructor: function(test) {
         test.expect(1);
 

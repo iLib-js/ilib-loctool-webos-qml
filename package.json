@@ -48,7 +48,6 @@
     },
     "dependencies": {
         "ilib": "^14.4.0",
-        "ilib-loctool-webos-ts-resource": "^1.1.0",
         "log4js": "^5.0.0"
     },
     "devDependencies": {

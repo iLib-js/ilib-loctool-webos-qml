@@ -23,7 +23,6 @@ var Locale = require("ilib/lib/Locale.js");
 var log4js = require("log4js");
 
 var QMLFile = require("./QMLFile.js");
-var JsonResourceFileType = require("ilib-loctool-webos-json-resource");
 
 var logger = log4js.getLogger("loctool.plugin.QMLFileType");
 
@@ -167,7 +166,7 @@ QMLFileType.prototype.getResourceTypes = function() {
  * need resource files
  */
 QMLFileType.prototype.getResourceFileType = function() {
-    return JsonResourceFileType;
+    //return JsonResourceFileType;
 };
 
 /**

@@ -87,7 +87,7 @@ QMLFile.trimComment = function(commentString) {
     return trimComment;
 }
 
-var reGetLocString = new RegExp(/\bresBundle_getLocString\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\)/g);
+var reqsTrString = new RegExp(/\b(qsTr|QT_TR_NOOP|QT_TR_N_NOOP)\(\s*"((\\"|[^"])*)"/g);
 var reGetLocStringWithKey = new RegExp(/\bresBundle_getLocStringWithKey\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\,\s*"((\\"|[^"])*)"\)/g);
 var reI18nComment = new RegExp(/\/(\*|\/)\s*i18n\s*(.*)($|\*\/)/);
 
@@ -102,18 +102,18 @@ QMLFile.prototype.parse = function(data) {
 
     var comment, match, key;
 
-    // To extract resBundle_getLocString()
-    reGetLocString.lastIndex = 0; // just to be safe
-    var result = reGetLocString.exec(data);
-    while (result && result.length > 1 && result[3]) {
-        match = result[3];
+    // To extract resBundle_qsTr()
+    reqsTrString.lastIndex = 0; // just to be safe
+    var result = reqsTrString.exec(data);
+    while (result && result.length > 2 && result[2]) {
+        match = result[2];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
 
-            var last = data.indexOf('\n', reGetLocString.lastIndex);
+            var last = data.indexOf('\n', reqsTrString.lastIndex);
             last = (last === -1) ? data.length : last;
-            var line = data.substring(reGetLocString.lastIndex, last);
+            var line = data.substring(reqsTrString.lastIndex, last);
             var commentResult = reI18nComment.exec(line);
             comment = (commentResult && commentResult.length > 1) ? commentResult[2] : undefined;
 
@@ -137,7 +137,7 @@ QMLFile.prototype.parse = function(data) {
             logger.warn("Warning: Bogus empty string in get string call: ");
             logger.warn("... " + data.substring(result.index, reGetString.lastIndex) + " ...");
         }
-        result = reGetLocString.exec(data);
+        result = reqsTrString.exec(data);
     }
 
     // To extract resBundle_getLocStringWithKey()
