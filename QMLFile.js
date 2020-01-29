@@ -87,8 +87,11 @@ QMLFile.trimComment = function(commentString) {
     return trimComment;
 }
 
-var reqsTrString = new RegExp(/\b(qsTr|QT_TR_NOOP|QT_TR_N_NOOP)\(\s*"((\\"|[^"])*)"/g);
-var reGetLocStringWithKey = new RegExp(/\bresBundle_getLocStringWithKey\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\,\s*"((\\"|[^"])*)"\)/g);
+var reqsTrString = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\(\s*"((\\"|[^"])*)"\s*\)/g);
+var reqsTrWithDisambiguation = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\(\s*"((\\"|[^"])*)"\s*,\s*"((\\"|[^"])*)"\)/g);
+var reqsTranslateString = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP|QT_TRANSLATE_NOOP3|QT_TRANSLATE_N_NOOP)\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\)/g);
+var reqsTranslateStringWithDisambiguation = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP3)\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\,\s*"((\\"|[^"])*)"\)/g);
+
 var reI18nComment = new RegExp(/\/(\*|\/)\s*i18n\s*(.*)($|\*\/)/);
 
 /**
@@ -140,19 +143,18 @@ QMLFile.prototype.parse = function(data) {
         result = reqsTrString.exec(data);
     }
 
-    // To extract resBundle_getLocStringWithKey()
-    reGetLocStringWithKey.lastIndex = 0; // just to be safe
-    var result = reGetLocStringWithKey.exec(data);
-    while (result && result.length > 1 && result[3] && result[5]) {
-        match = result[5];
-        key = result[3];
+    reqsTrWithDisambiguation.lastIndex = 0; // just to be safe
+    var result = reqsTrWithDisambiguation.exec(data);
+    while (result && result.length > 1 && result[2] && result[4]) {
+        match = result[2];
+        key = result[4];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
 
-            var last = data.indexOf('\n', reGetLocStringWithKey.lastIndex);
+            var last = data.indexOf('\n', reqsTrWithDisambiguation.lastIndex);
             last = (last === -1) ? data.length : last;
-            var line = data.substring(reGetLocStringWithKey.lastIndex, last);
+            var line = data.substring(reqsTrWithDisambiguation.lastIndex, last);
             var commentResult = reI18nComment.exec(line);
             comment = (commentResult && commentResult.length > 1) ? commentResult[2] : undefined;
             match = QMLFile.unescapeString(match);
@@ -173,9 +175,83 @@ QMLFile.prototype.parse = function(data) {
             this.set.add(r);
         } else {
             logger.warn("Warning: Bogus empty string in get string call: ");
-            logger.warn("... " + data.substring(result.index, reGetLocStringWithKey.lastIndex) + " ...");
+            logger.warn("... " + data.substring(result.index, reqsTrWithDisambiguation.lastIndex) + " ...");
         }
-        result = reGetLocStringWithKey.exec(data);
+        result = reqsTrWithDisambiguation.exec(data);
+    }
+    // To extract resBundle_qsTranslate()
+    reqsTranslateString.lastIndex = 0; // just to be safe
+    var result = reqsTranslateString.exec(data);
+    while (result && result.length > 4 && result[4]) {
+        match = result[4];
+
+        if (match && match.length) {
+            logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
+
+            var last = data.indexOf('\n', reqsTranslateString.lastIndex);
+            last = (last === -1) ? data.length : last;
+            var line = data.substring(reqsTranslateString.lastIndex, last);
+            var commentResult = reI18nComment.exec(line);
+            comment = (commentResult && commentResult.length > 1) ? commentResult[2] : undefined;
+
+            match = QMLFile.unescapeString(match);
+
+            var r = this.API.newResource({
+                resType: "string",
+                project: this.project.getProjectId(),
+                key: match,
+                sourceLocale: this.project.sourceLocale,
+                source: match,
+                autoKey: true,
+                pathName: this.pathName,
+                state: "new",
+                comment: QMLFile.trimComment(comment),
+                datatype: this.type.datatype,
+                index: this.resourceIndex++
+            });
+            this.set.add(r);
+        } else {
+            logger.warn("Warning: Bogus empty string in get string call: ");
+            logger.warn("... " + data.substring(result.index, reqsTranslateString.lastIndex) + " ...");
+        }
+        result = reqsTranslateString.exec(data);
+    }
+    reqsTranslateStringWithDisambiguation.lastIndex = 0; // just to be safe
+    var result = reqsTranslateStringWithDisambiguation.exec(data);
+    while (result && result.length > 4 && result[4] && result[6]) {
+        match = result[4];
+        key = result[6];
+
+        if (match && match.length) {
+            logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
+
+            var last = data.indexOf('\n', reqsTranslateStringWithDisambiguation.lastIndex);
+            last = (last === -1) ? data.length : last;
+            var line = data.substring(reqsTranslateStringWithDisambiguation.lastIndex, last);
+            var commentResult = reI18nComment.exec(line);
+            comment = (commentResult && commentResult.length > 1) ? commentResult[2] : undefined;
+
+            match = QMLFile.unescapeString(match);
+
+            var r = this.API.newResource({
+                resType: "string",
+                project: this.project.getProjectId(),
+                key: key,
+                sourceLocale: this.project.sourceLocale,
+                source: match,
+                autoKey: true,
+                pathName: this.pathName,
+                state: "new",
+                comment: QMLFile.trimComment(comment),
+                datatype: this.type.datatype,
+                index: this.resourceIndex++
+            });
+            this.set.add(r);
+        } else {
+            logger.warn("Warning: Bogus empty string in get string call: ");
+            logger.warn("... " + data.substring(result.index, reqsTranslateStringWithDisambiguation.lastIndex) + " ...");
+        }
+        result = reqsTranslateStringWithDisambiguation.exec(data);
     }
 };
 
@@ -213,3 +289,15 @@ QMLFile.prototype.localize = function() {};
 QMLFile.prototype.write = function() {};
 
 module.exports = QMLFile;
+
+
+/*
+ -------------------------------
+    property string groupDisplayName: qsTr("My Channels") /* group && group.displayName || "" */
+//    Then novaloc can't gerenate new strings because of slashstar comment.
+//    And below example not work too.
+
+//qsTr("My Channels") /*
+    //some comment messages...
+    //*/ qsTr("Another day")
+    //So I updated QMLFile.java. Please review my modification.

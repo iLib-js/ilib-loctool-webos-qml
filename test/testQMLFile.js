@@ -283,6 +283,75 @@ module.exports.qmlfile = {
         test.done();
     },
 
+    testQMLFileParseWithdisambiguation: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('qsTr("Ep", "Episode Abbreviation") + localeService.emptyString');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("Ep");
+        test.ok(r);
+        test.equal(r.getSource(), "Ep");
+        test.equal(r.getKey(), "Episode Abbreviation");
+
+        test.done();
+    },
+
+    testQMLFileParseWithqtTranslateWithdisambiguation: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('qsTranslate("appLaunch", "This function is not available.", "disambiguation text")');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("This function is not available.");
+        test.ok(r);
+        test.equal(r.getSource(), "This function is not available.");
+        test.equal(r.getKey(), "disambiguation text");
+
+        test.done();
+    },
+
+    testQMLFileParseWithqtTranslate: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('qsTranslate("appLaunch", "This function is not available.")');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("This function is not available.");
+        test.ok(r);
+        test.equal(r.getSource(), "This function is not available.");
+        test.equal(r.getKey(), "This function is not available.");
+
+        test.done();
+    },
+
     testQMLFileParseSimpleWithTranslatorComment: function(test) {
         test.expect(6);
 
@@ -538,8 +607,41 @@ module.exports.qmlfile = {
         test.done();
     },
 
-    /*testQMLFileExtractFile: function(test) {
-        test.expect(14);
+    testQMLFileParseMultilineComment: function(test) {
+        test.expect(10);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+
+        test.ok(qf);
+        qf.parse('        \n'+
+            '    qsTr("My Channels") /*\n' +
+            '    //some comment messages...\n' +
+            '    //*/ qsTr("Another day")\n' +
+            '\n');
+        var set = qf.getTranslationSet();
+        test.ok(set);
+        test.equal(set.size(), 2);
+
+        var r = set.getBySource("My Channels");
+        test.ok(r);
+        test.equal(r.getSource(), "My Channels");
+        test.equal(r.getKey(), "My Channels");
+        test.equal(r.getComment(), "some comment messages...");
+
+        r = set.getBySource("Another day");
+        test.ok(r);
+        test.equal(r.getSource(), "Another day");
+        test.equal(r.getKey(), "Another day");
+
+        test.done();
+    },
+
+    testQMLFileExtractFile: function(test) {
+        test.expect(4);
 
         var qf = new QMLFile({
             project: p,
@@ -551,37 +653,17 @@ module.exports.qmlfile = {
         // should read the file
         qf.extract();
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 29);
+        test.equal(set.size(), 36);
 
-        var r = set.getBySource("Decline");
-        test.ok(r);
-        test.equal(r.getSource(), "Decline");
-        test.equal(r.getKey(), "Decline");
+        var r = set.getBySource("Error Code : %1");
+        test.equal(r.getSource(), "Error Code : %1");
 
-        var r = set.getBy({
-            reskey: "Do you want to \naccept this request?"
-        });
-        test.ok(r);
-        test.equal(r[0].getSource(), "Do you want to \naccept this request?");
-        test.equal(r[0].getKey(), "Do you want to \naccept this request?");
-
-        var r = set.getBy({
-            reskey: "%s is blocked."
-        });
-        test.ok(r);
-        test.equal(r[0].getSource(), "%s is blocked.");
-        test.equal(r[0].getKey(), "%s is blocked.");
-
-        var r = set.getBy({
-            reskey: "\"Overlay Mode\" will be off now to start recording or Live Playback."
-        });
-        test.ok(r);
-        test.equal(r[0].getSource(), "\"Overlay Mode\" will be off now to start recording or Live Playback.");
-        test.equal(r[0].getKey(), "\"Overlay Mode\" will be off now to start recording or Live Playback.");
+        var r = set.getBySource("(3) For external audio devices, please go to 'Settings > Sound > Sound Out' and change settings to 'HDMI ARC'.");
+        test.equal(r.getSource(), "(3) For external audio devices, please go to 'Settings > Sound > Sound Out' and change settings to 'HDMI ARC'.");
 
         test.done();
     },
-*/
+
     testQMLFileExtractUndefinedFile: function(test) {
         test.expect(2);
 
@@ -599,8 +681,8 @@ module.exports.qmlfile = {
         test.equal(set.size(), 0);
         test.done();
     },
-    /*testQMLFileTest2: function(test) {
-        test.expect(14);
+    testQMLFileTest2: function(test) {
+        test.expect(50);
 
         var qf = new QMLFile({
             project: p,
@@ -611,30 +693,90 @@ module.exports.qmlfile = {
 
         qf.extract();
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 4);
+        test.equal(set.size(), 16);
 
-        var r = set.getBySource("Please say \"Stop\" when you see the desired channel.");
+        var r = set.getBySource("1: Test String for qsTr");
         test.ok(r);
-        test.equal(r.getSource(), "Please say \"Stop\" when you see the desired channel.");
-        test.equal(r.getKey(), "Please say \"Stop\" when you see the desired channel.");
+        test.equal(r.getSource(), "1: Test String for qsTr");
+        test.equal(r.getKey(), "1: Test String for qsTr");
 
-        var r = set.getBySource("You've declined the request from [{deviceName}].");
+        var r = set.getBySource("2: Test String for qsTrNoOp");
         test.ok(r);
-        test.equal(r.getSource(), "You've declined the request from [{deviceName}].");
-        test.equal(r.getKey(), "You've declined the request from [{deviceName}].");
+        test.equal(r.getSource(), "2: Test String for qsTrNoOp");
+        test.equal(r.getKey(), "2: Test String for qsTrNoOp");
 
-        var r = set.getBySource("Hello\n\t there");
+        var r = set.getBySource("3: Test String for QT_TR_NOOP");
         test.ok(r);
-        test.equal(r.getSource(), "Hello\n\t there");
-        test.equal(r.getKey(), "Hello\n\t there");
+        test.equal(r.getSource(), "3: Test String for QT_TR_NOOP");
+        test.equal(r.getKey(), "3: Test String for QT_TR_NOOP");
 
-        var r = set.getBySource("hi\n\t\t there \vwelcome");
+        var r = set.getBySource("4: Test String for QT_TR_NOOP");
         test.ok(r);
-        test.equal(r.getSource(), "hi\n\t\t there \vwelcome");
-        test.equal(r.getKey(), "hi\n\t\t there \vwelcome");
+        test.equal(r.getSource(), "4: Test String for QT_TR_NOOP");
+        test.equal(r.getKey(), "4: Test String for QT_TR_NOOP");
+
+        var r = set.getBySource("5: Test String for qsTr with disambiguation");
+        test.ok(r);
+        test.equal(r.getSource(), "5: Test String for qsTr with disambiguation");
+        test.equal(r.getKey(), "disambiguation string");
+
+        var r = set.getBySource("6: Test String for qsTrNoOp with disambiguation");
+        test.ok(r);
+        test.equal(r.getSource(), "6: Test String for qsTrNoOp with disambiguation");
+        test.equal(r.getKey(), "disambiguation string");
+
+        var r = set.getBySource("7: Test String for QT_TR_NOOP with disambiguation");
+        test.ok(r);
+        test.equal(r.getSource(), "7: Test String for QT_TR_NOOP with disambiguation");
+        test.equal(r.getKey(), "disambiguation string");
+
+        var r = set.getBySource("8: Test String for QT_TR_NOOP with disambiguation");
+        test.ok(r);
+        test.equal(r.getSource(), "8: Test String for QT_TR_NOOP with disambiguation");
+        test.equal(r.getKey(), "disambiguation string");
+
+        var r = set.getBySource("9: Test String for qsTranslate");
+        test.ok(r);
+        test.equal(r.getSource(), "9: Test String for qsTranslate");
+        test.equal(r.getKey(), "Test String for qsTranslate");
+
+        var r = set.getBySource("10: Test String for qsTranslateNoOp");
+        test.ok(r);
+        test.equal(r.getSource(), "10: Test String for qsTranslateNoOp");
+        test.equal(r.getKey(), "10: Test String for qsTranslateNoOp");
+
+        var r = set.getBySource("11: Test String for QT_TRANSLATE_NOOP");
+        test.ok(r);
+        test.equal(r.getSource(), "11: Test String for QT_TRANSLATE_NOOP");
+        test.equal(r.getKey(), "11: Test String for QT_TRANSLATE_NOOP");
+
+        var r = set.getBySource("12: Test String for QT_TRANSLATE_NOOP3");
+        test.ok(r);
+        test.equal(r.getSource(), "12: Test String for QT_TRANSLATE_NOOP3");
+        test.equal(r.getKey(), "12: Test String for QT_TRANSLATE_NOOP3");
+
+        var r = set.getBySource("13: Test String for QT_TRANSLATE_N_NOOP");
+        test.ok(r);
+        test.equal(r.getSource(), "13: Test String for QT_TRANSLATE_N_NOOP");
+        test.equal(r.getKey(), "13: Test String for QT_TRANSLATE_N_NOOP");
+
+        var r = set.getBySource("14: Test String for qsTranslate with disambiguation");
+        test.ok(r);
+        test.equal(r.getSource(), "14: Test String for qsTranslate with disambiguation");
+        test.equal(r.getKey(), "disambiguation string");
+
+        var r = set.getBySource("15: Test String for qsTranslateNoOp with disambiguation");
+        test.ok(r);
+        test.equal(r.getSource(), "15: Test String for qsTranslateNoOp with disambiguation");
+        test.equal(r.getKey(), "disambiguation string");
+
+        var r = set.getBySource("16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
+        test.ok(r);
+        test.equal(r.getSource(), "16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
+        test.equal(r.getKey(), "disambiguation string");
 
         test.done();
-    },*/
+    },
     testQMLFileTest3: function(test) {
         test.expect(2);
 
