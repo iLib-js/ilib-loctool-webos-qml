@@ -289,15 +289,3 @@ QMLFile.prototype.localize = function() {};
 QMLFile.prototype.write = function() {};
 
 module.exports = QMLFile;
-
-
-/*
- -------------------------------
-    property string groupDisplayName: qsTr("My Channels") /* group && group.displayName || "" */
-//    Then novaloc can't gerenate new strings because of slashstar comment.
-//    And below example not work too.
-
-//qsTr("My Channels") /*
-    //some comment messages...
-    //*/ qsTr("Another day")
-    //So I updated QMLFile.java. Please review my modification.
