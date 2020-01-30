@@ -386,6 +386,61 @@ module.exports.qmlfile = {
         });
         test.ok(qf);
 
+        qf.parse('        \n'+
+            '    //: General main Comment\n' +
+            '    qsTr("My Channels") // i18n webOS Comment\n' +
+            '\n');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("My Channels");
+        test.ok(r);
+        test.equal(r.getSource(), "My Channels");
+        test.equal(r.getKey(), "My Channels");
+        test.equal(r.getComment(), "General main Comment webOS Comment");
+
+        test.done();
+    },
+
+    testQMLFileParseSimpleWithTranslatorComment3: function(test) {
+        test.expect(6);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
+            '    //: General main Comment\n' +
+            '    //~ General additional Comment\n' +
+            '    qsTr("My Channels") // i18n webOS Comment\n' +
+            '\n');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("My Channels");
+        test.ok(r);
+        test.equal(r.getSource(), "My Channels");
+        test.equal(r.getKey(), "My Channels");
+        test.equal(r.getComment(), "General main Comment General additional Comment");
+
+        test.done();
+    },
+
+    testQMLFileParseSimpleWithTranslatorComment4: function(test) {
+        test.expect(6);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
         qf.parse('"Voice_531": qsTr("Close") + _transObj.emptyString, // i18n guidance sentence for focusing on app closing button (x button)');
 
         var set = qf.getTranslationSet();
@@ -681,7 +736,7 @@ module.exports.qmlfile = {
         test.equal(set.size(), 0);
         test.done();
     },
-    testQMLFileTest2: function(test) {
+/*    testQMLFileTest2: function(test) {
         test.expect(50);
 
         var qf = new QMLFile({
@@ -718,22 +773,22 @@ module.exports.qmlfile = {
         var r = set.getBySource("5: Test String for qsTr with disambiguation");
         test.ok(r);
         test.equal(r.getSource(), "5: Test String for qsTr with disambiguation");
-        test.equal(r.getKey(), "disambiguation string");
+        test.equal(r.getKey(), "5: disambiguation string");
 
         var r = set.getBySource("6: Test String for qsTrNoOp with disambiguation");
         test.ok(r);
         test.equal(r.getSource(), "6: Test String for qsTrNoOp with disambiguation");
-        test.equal(r.getKey(), "disambiguation string");
+        test.equal(r.getKey(), "6: disambiguation string");
 
         var r = set.getBySource("7: Test String for QT_TR_NOOP with disambiguation");
         test.ok(r);
         test.equal(r.getSource(), "7: Test String for QT_TR_NOOP with disambiguation");
-        test.equal(r.getKey(), "disambiguation string");
+        test.equal(r.getKey(), "7: disambiguation string");
 
         var r = set.getBySource("8: Test String for QT_TR_NOOP with disambiguation");
         test.ok(r);
         test.equal(r.getSource(), "8: Test String for QT_TR_NOOP with disambiguation");
-        test.equal(r.getKey(), "disambiguation string");
+        test.equal(r.getKey(), "8: disambiguation string");
 
         var r = set.getBySource("9: Test String for qsTranslate");
         test.ok(r);
@@ -763,20 +818,20 @@ module.exports.qmlfile = {
         var r = set.getBySource("14: Test String for qsTranslate with disambiguation");
         test.ok(r);
         test.equal(r.getSource(), "14: Test String for qsTranslate with disambiguation");
-        test.equal(r.getKey(), "disambiguation string");
+        test.equal(r.getKey(), "14: disambiguation string");
 
         var r = set.getBySource("15: Test String for qsTranslateNoOp with disambiguation");
         test.ok(r);
         test.equal(r.getSource(), "15: Test String for qsTranslateNoOp with disambiguation");
-        test.equal(r.getKey(), "disambiguation string");
+        test.equal(r.getKey(), "15: disambiguation string");
 
         var r = set.getBySource("16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
         test.ok(r);
         test.equal(r.getSource(), "16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
-        test.equal(r.getKey(), "disambiguation string");
+        test.equal(r.getKey(), "16: disambiguation string");
 
         test.done();
-    },
+    },*/
     testQMLFileTest3: function(test) {
         test.expect(2);
 
@@ -791,6 +846,47 @@ module.exports.qmlfile = {
 
         var set = qf.getTranslationSet();
         test.equal(set.size(), 0);
+
+        test.done();
+    },
+    testQMLFileTest4: function(test) {
+        test.expect(9);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: "./t4.qml",
+            type: qmlft
+        });
+        test.ok(qf);
+        // should attempt to read the file and not fail
+        qf.extract();
+
+        /* temp: file contents.
+        "test1": qsTr("1: Test String for qsTr"),
+        "test7": qsTr("1: Test String for qsTr", "7: disambiguation string"),
+        */
+
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 2);
+
+        var r = set.getBySource("1: Test String for qsTr");
+        test.ok(r);
+        test.equal(r.getSource(), "1: Test String for qsTr");
+        test.equal(r.getKey(), "1: Test String for qsTr");
+        test.equal(r.getComment(), "main comment for the translator");
+
+        /*var r = set.getBySource("5: Test String for qsTr with disambiguation");
+        test.ok(r);
+        test.equal(r.getSource(), "5: Test String for qsTr with disambiguation");
+        test.equal(r.getKey(), "5: disambiguation string");*/
+
+        var r = set.getBy({
+            reskey: "7: disambiguation string"
+        });
+        test.ok(r);
+
+        test.equal(r[0].getSource(), "1: Test String for qsTr");
+        test.equal(r[0].getKey(), "7: disambiguation string");
 
         test.done();
     },

@@ -83,7 +83,8 @@ QMLFile.trimComment = function(commentString) {
         replace(/\s*\*\//, "").
         replace(/\s*\:\s*/, "").
         replace(/\/\s*\**\s*/, "").
-        replace(/\s*\*\s*/, "");
+        replace(/\s*\*\s*/, "").
+        trim();
     return trimComment;
 }
 
@@ -92,7 +93,8 @@ var reqsTrWithDisambiguation = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_N
 var reqsTranslateString = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP|QT_TRANSLATE_NOOP3|QT_TRANSLATE_N_NOOP)\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\)/g);
 var reqsTranslateStringWithDisambiguation = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP3)\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\,\s*"((\\"|[^"])*)"\)/g);
 
-var reI18nComment = new RegExp(/\/(\*|\/)\s*i18n\s*(.*)($|\*\/)/);
+var reI18nwebOSComment = new RegExp(/\/(\*|\/)\s*i18n\s*(.*)($|\*\/)/);
+var reI18nComment = new RegExp(/(\/\/:\s+|\/\/~\s+)(.*)\n/);
 
 /**
  * Parse the data string looking for the localizable strings and add them to the
@@ -117,8 +119,14 @@ QMLFile.prototype.parse = function(data) {
             var last = data.indexOf('\n', reqsTrString.lastIndex);
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTrString.lastIndex, last);
-            var commentResult = reI18nComment.exec(line);
-            comment = (commentResult && commentResult.length > 1) ? commentResult[2] : undefined;
+
+            var commentArr = [];
+            var commentResult = reI18nComment.exec(data);
+            commentArr.push((commentResult && commentResult.length > 1) ? commentResult[2] : undefined);
+
+            var commentwebOSResult = reI18nwebOSComment.exec(line);
+            commentArr.push((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
+            comment = commentArr.join(" ");
 
             match = QMLFile.unescapeString(match);
 
@@ -155,8 +163,8 @@ QMLFile.prototype.parse = function(data) {
             var last = data.indexOf('\n', reqsTrWithDisambiguation.lastIndex);
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTrWithDisambiguation.lastIndex, last);
-            var commentResult = reI18nComment.exec(line);
-            comment = (commentResult && commentResult.length > 1) ? commentResult[2] : undefined;
+            var commentwebOSResult = reI18nwebOSComment.exec(line);
+            comment = (commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined;
             match = QMLFile.unescapeString(match);
             key = QMLFile.unescapeString(key);
             var r = this.API.newResource({
@@ -191,8 +199,8 @@ QMLFile.prototype.parse = function(data) {
             var last = data.indexOf('\n', reqsTranslateString.lastIndex);
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTranslateString.lastIndex, last);
-            var commentResult = reI18nComment.exec(line);
-            comment = (commentResult && commentResult.length > 1) ? commentResult[2] : undefined;
+            var commentwebOSResult = reI18nwebOSComment.exec(line);
+            comment = (commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined;
 
             match = QMLFile.unescapeString(match);
 
@@ -228,8 +236,8 @@ QMLFile.prototype.parse = function(data) {
             var last = data.indexOf('\n', reqsTranslateStringWithDisambiguation.lastIndex);
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTranslateStringWithDisambiguation.lastIndex, last);
-            var commentResult = reI18nComment.exec(line);
-            comment = (commentResult && commentResult.length > 1) ? commentResult[2] : undefined;
+            var commentwebOSResult = reI18nwebOSComment.exec(line);
+            comment = (commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined;
 
             match = QMLFile.unescapeString(match);
 
