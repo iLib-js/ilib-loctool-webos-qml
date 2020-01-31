@@ -426,7 +426,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "My Channels");
         test.equal(r.getKey(), "My Channels");
-        test.equal(r.getComment(), "General main Comment General additional Comment");
+        test.equal(r.getComment(), "General main Comment webOS Comment General additional Comment");
 
         test.done();
     },
@@ -451,6 +451,87 @@ module.exports.qmlfile = {
         test.equal(r.getSource(), "Close");
         test.equal(r.getKey(), "Close");
         test.equal(r.getComment(), "guidance sentence for focusing on app closing button (x button)");
+
+        test.done();
+    },
+
+    testQMLFileParseSimpleWithTranslatorComment5: function(test) {
+        test.expect(6);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
+            '    //: General main Comment\n' +
+            '    qsTr("My Channels\n \t ...", "number") // i18n info to translator\n' +
+            '\n');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("My Channels\n \t ...");
+        test.ok(r);
+        test.equal(r.getSource(), "My Channels\n \t ...");
+        test.equal(r.getKey(), "number");
+        test.equal(r.getComment(), "General main Comment info to translator");
+
+        test.done();
+    },
+
+    testQMLFileParseSimpleWithTranslatorComment6: function(test) {
+        test.expect(6);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
+            '    //: General main Comment\n' +
+            '    qsTranslate("context", "My Channels\n \t ...", "number") // i18n info to translator\n' +
+            '\n');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("My Channels\n \t ...");
+        test.ok(r);
+        test.equal(r.getSource(), "My Channels\n \t ...");
+        test.equal(r.getKey(), "number");
+        test.equal(r.getComment(), "General main Comment info to translator");
+
+        test.done();
+    },
+
+    testQMLFileParseSimpleWithTranslatorComment7: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
+            '    //: comment1\n' +
+            '    //~ comment2\n' +
+            '    qsTranslate("context", "My Channels\n \t ...") // i18n comment3\n' +
+            '\n');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("My Channels\n \t ...");
+        test.ok(r);
+        test.equal(r.getSource(), "My Channels\n \t ...");
+        test.equal(r.getComment(), "comment1 comment3 comment2");
 
         test.done();
     },
@@ -673,7 +754,7 @@ module.exports.qmlfile = {
 
         test.ok(qf);
         qf.parse('        \n'+
-            '    qsTr("My Channels") /*\n' +
+            '    qsTr("My Channels") // i18n some comment messages... /*\n' +
             '    //some comment messages...\n' +
             '    //*/ qsTr("Another day")\n' +
             '\n');
@@ -869,11 +950,11 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.equal(set.size(), 2);
 
-        var r = set.getBySource("1: Test String for qsTr");
+        var r = set.getBySource("\"1\": Test String for qsTr");
         test.ok(r);
-        test.equal(r.getSource(), "1: Test String for qsTr");
-        test.equal(r.getKey(), "1: Test String for qsTr");
-        test.equal(r.getComment(), "main comment for the translator");
+        test.equal(r.getSource(), "\"1\": Test String for qsTr");
+        test.equal(r.getKey(), "\"1\": Test String for qsTr");
+        test.equal(r.getComment(), "--> main comment for the translator  --> Additional comment for the translator");
 
         /*var r = set.getBySource("5: Test String for qsTr with disambiguation");
         test.ok(r);
@@ -885,7 +966,7 @@ module.exports.qmlfile = {
         });
         test.ok(r);
 
-        test.equal(r[0].getSource(), "1: Test String for qsTr");
+        test.equal(r[0].getSource(), "\"1\": Test String for qsTr");
         test.equal(r[0].getKey(), "7: disambiguation string");
 
         test.done();

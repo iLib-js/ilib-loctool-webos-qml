@@ -1,7 +1,7 @@
 /*
- * QMLFile.js - plugin to extract resources from a C source code file
+ * QMLFile.js - plugin to extract resources from a QML source code file
  *
- * Copyright © 2019-2020, JEDLSoft
+ * Copyright © 2020, JEDLSoft
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 var fs = require("fs");
 var path = require("path");
 var log4js = require("log4js");
-
 var logger = log4js.getLogger("loctool.plugin.QMLFile");
 
 /**
@@ -37,7 +36,6 @@ var QMLFile = function(props) {
     this.pathName = props.pathName;
     this.type = props.type;
     this.API = props.project.getAPI();
-
     this.set = this.API.newTranslationSet(this.project ? this.project.sourceLocale : "zxx-XX");
 };
 
@@ -94,7 +92,8 @@ var reqsTranslateString = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLAT
 var reqsTranslateStringWithDisambiguation = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP3)\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\,\s*"((\\"|[^"])*)"\)/g);
 
 var reI18nwebOSComment = new RegExp(/\/(\*|\/)\s*i18n\s*(.*)($|\*\/)/);
-var reI18nComment = new RegExp(/(\/\/:\s+|\/\/~\s+)(.*)\n/);
+var reI18nMainComment = new RegExp(/\/\/:\s+(.*)\n/);
+var reI18nExtraComment = new RegExp(/\/\/~\s+(.*)\n/);
 
 /**
  * Parse the data string looking for the localizable strings and add them to the
@@ -105,13 +104,14 @@ QMLFile.prototype.parse = function(data) {
     logger.debug("Extracting strings from " + this.pathName);
     this.resourceIndex = 0;
 
-    var comment, match, key;
+    var match, key;
 
     // To extract resBundle_qsTr()
     reqsTrString.lastIndex = 0; // just to be safe
     var result = reqsTrString.exec(data);
     while (result && result.length > 2 && result[2]) {
         match = result[2];
+        var comment = undefined, commentArr = [], commentResult;
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -120,12 +120,12 @@ QMLFile.prototype.parse = function(data) {
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTrString.lastIndex, last);
 
-            var commentArr = [];
-            var commentResult = reI18nComment.exec(data);
-            commentArr.push((commentResult && commentResult.length > 1) ? commentResult[2] : undefined);
-
-            var commentwebOSResult = reI18nwebOSComment.exec(line);
+            commentResult = reI18nMainComment.exec(data);
+            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
+            commentwebOSResult = reI18nwebOSComment.exec(line);
             commentArr.push((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
+            commentResult = reI18nExtraComment.exec(data);
+            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
             comment = commentArr.join(" ");
 
             match = QMLFile.unescapeString(match);
@@ -151,11 +151,13 @@ QMLFile.prototype.parse = function(data) {
         result = reqsTrString.exec(data);
     }
 
+    // To extract resBundle_qsTr() with disambiguation(key)
     reqsTrWithDisambiguation.lastIndex = 0; // just to be safe
     var result = reqsTrWithDisambiguation.exec(data);
     while (result && result.length > 1 && result[2] && result[4]) {
         match = result[2];
         key = result[4];
+        var comment = undefined, commentArr = [], commentResult;
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -163,10 +165,18 @@ QMLFile.prototype.parse = function(data) {
             var last = data.indexOf('\n', reqsTrWithDisambiguation.lastIndex);
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTrWithDisambiguation.lastIndex, last);
-            var commentwebOSResult = reI18nwebOSComment.exec(line);
-            comment = (commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined;
+
+            commentResult = reI18nMainComment.exec(data);
+            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
+            commentwebOSResult = reI18nwebOSComment.exec(line);
+            commentArr.push((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
+            commentResult = reI18nExtraComment.exec(data);
+            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
+            comment = commentArr.join(" ");
+
             match = QMLFile.unescapeString(match);
             key = QMLFile.unescapeString(key);
+
             var r = this.API.newResource({
                 resType: "string",
                 project: this.project.getProjectId(),
@@ -187,11 +197,13 @@ QMLFile.prototype.parse = function(data) {
         }
         result = reqsTrWithDisambiguation.exec(data);
     }
+
     // To extract resBundle_qsTranslate()
     reqsTranslateString.lastIndex = 0; // just to be safe
     var result = reqsTranslateString.exec(data);
     while (result && result.length > 4 && result[4]) {
         match = result[4];
+        var comment = undefined, commentArr = [], commentResult;
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -199,8 +211,14 @@ QMLFile.prototype.parse = function(data) {
             var last = data.indexOf('\n', reqsTranslateString.lastIndex);
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTranslateString.lastIndex, last);
-            var commentwebOSResult = reI18nwebOSComment.exec(line);
-            comment = (commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined;
+
+            commentResult = reI18nMainComment.exec(data);
+            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
+            commentwebOSResult = reI18nwebOSComment.exec(line);
+            commentArr.push((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
+            commentResult = reI18nExtraComment.exec(data);
+            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
+            comment = commentArr.join(" ");
 
             match = QMLFile.unescapeString(match);
 
@@ -224,11 +242,14 @@ QMLFile.prototype.parse = function(data) {
         }
         result = reqsTranslateString.exec(data);
     }
+
+    // To extract resBundle_qsTranslate() with disambiguation(key)
     reqsTranslateStringWithDisambiguation.lastIndex = 0; // just to be safe
     var result = reqsTranslateStringWithDisambiguation.exec(data);
     while (result && result.length > 4 && result[4] && result[6]) {
         match = result[4];
         key = result[6];
+        var comment = undefined, commentArr = [], commentResult;
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -236,8 +257,14 @@ QMLFile.prototype.parse = function(data) {
             var last = data.indexOf('\n', reqsTranslateStringWithDisambiguation.lastIndex);
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTranslateStringWithDisambiguation.lastIndex, last);
-            var commentwebOSResult = reI18nwebOSComment.exec(line);
-            comment = (commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined;
+
+            commentResult = reI18nMainComment.exec(data);
+            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
+            commentwebOSResult = reI18nwebOSComment.exec(line);
+            commentArr.push((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
+            commentResult = reI18nExtraComment.exec(data);
+            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
+            comment = commentArr.join(" ");
 
             match = QMLFile.unescapeString(match);
 
