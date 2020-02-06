@@ -109,9 +109,10 @@ QMLFile.prototype.parse = function(data) {
     // To extract resBundle_qsTr()
     reqsTrString.lastIndex = 0; // just to be safe
     var result = reqsTrString.exec(data);
+
     while (result && result.length > 2 && result[2]) {
         match = result[2];
-        var comment = undefined, commentArr = [], commentResult;
+        var comment = undefined, commentArr = [], commentResult = [];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -157,7 +158,7 @@ QMLFile.prototype.parse = function(data) {
     while (result && result.length > 1 && result[2] && result[4]) {
         match = result[2];
         key = result[4];
-        var comment = undefined, commentArr = [], commentResult;
+        var comment = undefined, commentArr = [], commentResult = [];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -190,6 +191,7 @@ QMLFile.prototype.parse = function(data) {
                 datatype: this.type.datatype,
                 index: this.resourceIndex++
             });
+
             this.set.add(r);
         } else {
             logger.warn("Warning: Bogus empty string in get string call: ");
@@ -203,7 +205,7 @@ QMLFile.prototype.parse = function(data) {
     var result = reqsTranslateString.exec(data);
     while (result && result.length > 4 && result[4]) {
         match = result[4];
-        var comment = undefined, commentArr = [], commentResult;
+        var comment = undefined, commentArr = [], commentResult = [];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -249,7 +251,7 @@ QMLFile.prototype.parse = function(data) {
     while (result && result.length > 4 && result[4] && result[6]) {
         match = result[4];
         key = result[6];
-        var comment = undefined, commentArr = [], commentResult;
+        var comment = undefined, commentArr = [], commentResult = [];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
