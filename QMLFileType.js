@@ -38,7 +38,7 @@ var QMLFileType = function(project) {
 };
 
 /**
- * Return true if the given path is a qml file and is handled
+ * Return true if the given path is a qml or js file and is handled
  * by the current file type.
  *
  * @param {String} pathName path to the file being questions
@@ -48,7 +48,8 @@ var QMLFileType = function(project) {
 QMLFileType.prototype.handles = function(pathName) {
     logger.debug("QMLFileType handles " + pathName + "?");
     var ret = false;
-    if (pathName.length > 4 && pathName.substring(pathName.length - 4) === ".qml") {
+    if ((pathName.length > 4 && pathName.substring(pathName.length - 4) === ".qml") ||
+        (pathName.length > 3 && pathName.substring(pathName.length - 3) === ".js")) {
         ret = true;
     } 
 

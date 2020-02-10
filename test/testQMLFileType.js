@@ -55,6 +55,22 @@ module.exports.qmlfiletype = {
         test.ok(cft.handles("foo/bar/test.qml"));
         test.done();
     },
+    testQMLFileTypeHandlesJSTrue: function(test) {
+        test.expect(2);
+
+        var cft = new QMLFileType(p);
+        test.ok(cft);
+        test.ok(cft.handles("foo.js"));
+        test.done();
+    },
+    testQMLFileTypeHandlesJSTrue2: function(test) {
+        test.expect(2);
+
+        var cft = new QMLFileType(p);
+        test.ok(cft);
+        test.ok(cft.handles("foo/bar.js"));
+        test.done();
+    },
 
     testQMLFileTypeHandlesJSXFalse: function(test) {
         test.expect(2);
