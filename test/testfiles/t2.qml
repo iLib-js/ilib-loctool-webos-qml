@@ -15,4 +15,6 @@ property var strings: {
 	"test14": qsTranslate("context", "14: Test String for qsTranslate with disambiguation", "14: disambiguation string"),
 	"test15": qsTranslateNoOp("context", "15: Test String for qsTranslateNoOp with disambiguation", "15: disambiguation string"),
 	"test16": QT_TRANSLATE_NOOP3("context", "16: Test String for QT_TRANSLATE_NOOP3 with disambiguation", "16: disambiguation string"),
+	"test17": qsTranslate('context', '17: single-quote string test'),
+	"test18": qsTr('18: Test "String" for qsTr'),
 }

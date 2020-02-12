@@ -54,11 +54,7 @@ QMLFile.unescapeString = function(string) {
         replace(/([^\\])\\\\/g, "$1\\").
         replace(/^\\"/, '"').
         replace(/([^\\])\\"/g, '$1"').
-        replace(/\\"/g, '"').
-        replace(/\\n/g, "\n").
-        replace(/\\t/g, "\t").
-        replace(/\\v/g, "\v");
-
+        replace(/\\"/g, '"');
     return unescaped;
 };
 
@@ -86,10 +82,10 @@ QMLFile.trimComment = function(commentString) {
     return trimComment;
 }
 
-var reqsTrString = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\(\s*"((\\"|[^"])*)"\s*\)/g);
-var reqsTrWithDisambiguation = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\(\s*"((\\"|[^"])*)"\s*,\s*"((\\"|[^"])*)"\)/g);
-var reqsTranslateString = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP|QT_TRANSLATE_NOOP3|QT_TRANSLATE_N_NOOP)\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\)/g);
-var reqsTranslateStringWithDisambiguation = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP3)\(\s*([^"][^,]*|"(\\"|[^"])*")\s*\,\s*"((\\"|[^"])*)"\s*\,\s*"((\\"|[^"])*)"\)/g);
+var reqsTrString = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
+var reqsTrWithDisambiguation = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
+var reqsTranslateString = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP|QT_TRANSLATE_NOOP3|QT_TRANSLATE_N_NOOP)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
+var reqsTranslateStringWithDisambiguation = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP3)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
 
 var reI18nwebOSComment = new RegExp(/\/(\*|\/)\s*i18n\s*(.*)($|\*\/)/);
 var reI18nMainComment = new RegExp(/\/\/:\s+(.*)\n/);
@@ -110,8 +106,9 @@ QMLFile.prototype.parse = function(data) {
     reqsTrString.lastIndex = 0; // just to be safe
     var result = reqsTrString.exec(data);
 
-    while (result && result.length > 2 && result[2]) {
-        match = result[2];
+    while (result && result.length > 3 && result[2]) {
+        match = (result[2][0] === '"')? result[3]: result[5];
+
         var comment = undefined, commentArr = [], commentResult = [];
 
         if (match && match.length) {
@@ -155,9 +152,10 @@ QMLFile.prototype.parse = function(data) {
     // To extract resBundle_qsTr() with disambiguation(key)
     reqsTrWithDisambiguation.lastIndex = 0; // just to be safe
     var result = reqsTrWithDisambiguation.exec(data);
-    while (result && result.length > 1 && result[2] && result[4]) {
-        match = result[2];
-        key = result[4];
+    while (result && result.length > 1 && result[2]) {
+        match = (result[2][0] === '"')? result[3]: result[5];
+        key = (result[7][0] === '"')? result[8]: result[10];
+
         var comment = undefined, commentArr = [], commentResult = [];
 
         if (match && match.length) {
@@ -203,8 +201,9 @@ QMLFile.prototype.parse = function(data) {
     // To extract resBundle_qsTranslate()
     reqsTranslateString.lastIndex = 0; // just to be safe
     var result = reqsTranslateString.exec(data);
-    while (result && result.length > 4 && result[4]) {
-        match = result[4];
+    while (result && result.length > 7 && result[7]) {
+        match = (result[7][0] === '"')? result[8]: result[10];
+
         var comment = undefined, commentArr = [], commentResult = [];
 
         if (match && match.length) {
@@ -248,9 +247,13 @@ QMLFile.prototype.parse = function(data) {
     // To extract resBundle_qsTranslate() with disambiguation(key)
     reqsTranslateStringWithDisambiguation.lastIndex = 0; // just to be safe
     var result = reqsTranslateStringWithDisambiguation.exec(data);
-    while (result && result.length > 4 && result[4] && result[6]) {
+    while (result && result.length > 7 && result[7]) {
         match = result[4];
         key = result[6];
+
+        match = (result[7][0] === '"')? result[8]: result[10];
+        key = (result[12][0] === '"')? result[13]: result[15];
+
         var comment = undefined, commentArr = [], commentResult = [];
 
         if (match && match.length) {

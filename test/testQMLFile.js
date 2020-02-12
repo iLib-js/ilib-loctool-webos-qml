@@ -145,6 +145,31 @@ module.exports.qmlfile = {
 
         test.done();
     },
+    testQMLFileParseSimpleGetByKeywithSingleQuote: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse("button2: qsTr('Start') + _emptyString");
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBy({
+            reskey: 'Start'
+        });
+        test.ok(r);
+
+        test.equal(r[0].getSource(), "Start");
+        test.equal(r[0].getKey(), "Start");
+
+        test.done();
+    },
 
     testQMLFileParseSimpleGetBySource: function(test) {
         test.expect(5);
@@ -271,7 +296,7 @@ module.exports.qmlfile = {
         });
         test.ok(qf);
 
-        qf.parse('string = qsTr("TV: Internal Storage [%1%2 Free / %3%4]").arg(strFreeSpace).arg(capaString[freeCapaIndex]).arg(strTotalSpace).arg(capaString[totalCapaIndex]);');
+        qf.parse("string = qsTr('TV: Internal Storage [%1%2 Free / %3%4]').arg(strFreeSpace).arg(capaString[freeCapaIndex]).arg(strTotalSpace).arg(capaString[totalCapaIndex]);");
 
         var set = qf.getTranslationSet();
         test.ok(set);
@@ -307,6 +332,29 @@ module.exports.qmlfile = {
         test.done();
     },
 
+    testQMLFileParseWithdisambiguationwithSingleQuote: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse("qsTr('Ep', 'Episode Abbreviation') + localeService.emptyString");
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("Ep");
+        test.ok(r);
+        test.equal(r.getSource(), "Ep");
+        test.equal(r.getKey(), "Episode Abbreviation");
+
+        test.done();
+    },
+
     testQMLFileParseWithqtTranslateWithdisambiguation: function(test) {
         test.expect(5);
 
@@ -330,6 +378,29 @@ module.exports.qmlfile = {
         test.done();
     },
 
+    testQMLFileParseWithqtTranslateWithdisambiguationwithSingleQuote: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse("qsTranslate('appLaunch', 'This function is not available.', 'disambiguation text')");
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("This function is not available.");
+        test.ok(r);
+        test.equal(r.getSource(), "This function is not available.");
+        test.equal(r.getKey(), "disambiguation text");
+
+        test.done();
+    },
+
     testQMLFileParseWithqtTranslate: function(test) {
         test.expect(5);
 
@@ -341,6 +412,29 @@ module.exports.qmlfile = {
         test.ok(qf);
 
         qf.parse('qsTranslate("appLaunch", "This function is not available.")');
+
+        var set = qf.getTranslationSet();
+        test.ok(set);
+
+        var r = set.getBySource("This function is not available.");
+        test.ok(r);
+        test.equal(r.getSource(), "This function is not available.");
+        test.equal(r.getKey(), "This function is not available.");
+
+        test.done();
+    },
+
+    testQMLFileParseWithqtTranslatewithSingleQuote: function(test) {
+        test.expect(5);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse("qsTranslate('appLaunch', 'This function is not available.')");
 
         var set = qf.getTranslationSet();
         test.ok(set);
@@ -790,13 +884,13 @@ module.exports.qmlfile = {
         // should read the file
         qf.extract();
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 36);
+        test.equal(set.size(), 8);
 
-        var r = set.getBySource("Error Code : %1");
-        test.equal(r.getSource(), "Error Code : %1");
+        var r = set.getBySource("(8608):PPV(Out of contract time)");
+        test.equal(r.getSource(), "(8608):PPV(Out of contract time)");
 
-        var r = set.getBySource("(3) For external audio devices, please go to 'Settings > Sound > Sound Out' and change settings to 'HDMI ARC'.");
-        test.equal(r.getSource(), "(3) For external audio devices, please go to 'Settings > Sound > Sound Out' and change settings to 'HDMI ARC'.");
+        var r = set.getBySource("(1) Please check the power of the external devices and cable connection status.");
+        test.equal(r.getSource(), "(1) Please check the power of the external devices and cable connection status.");
 
         test.done();
     },
@@ -819,7 +913,7 @@ module.exports.qmlfile = {
         test.done();
     },
     testQMLFileTest2: function(test) {
-        test.expect(51);
+        test.expect(57);
 
         var qf = new QMLFile({
             project: p,
@@ -830,88 +924,98 @@ module.exports.qmlfile = {
 
         qf.extract();
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 16);
+        test.equal(set.size(), 18);
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "1: Test String for qsTr", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "1: Test String for qsTr", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "1: Test String for qsTr");
         test.equal(r.getKey(), "1: Test String for qsTr");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "2: Test String for qsTrNoOp", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "2: Test String for qsTrNoOp", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "2: Test String for qsTrNoOp");
         test.equal(r.getKey(), "2: Test String for qsTrNoOp");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "3: Test String for QT_TR_NOOP", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "3: Test String for QT_TR_NOOP", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "3: Test String for QT_TR_NOOP");
         test.equal(r.getKey(), "3: Test String for QT_TR_NOOP");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "4: Test String for QT_TR_N_NOOP", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "4: Test String for QT_TR_N_NOOP", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "4: Test String for QT_TR_N_NOOP");
         test.equal(r.getKey(), "4: Test String for QT_TR_N_NOOP");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "5: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "5: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "5: Test String for qsTr with disambiguation");
         test.equal(r.getKey(), "5: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "6: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "6: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "6: Test String for qsTrNoOp with disambiguation");
         test.equal(r.getKey(), "6: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "7: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "7: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "7: Test String for QT_TR_NOOP with disambiguation");
         test.equal(r.getKey(), "7: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "8: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "8: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "8: Test String for QT_TR_N_NOOP with disambiguation");
         test.equal(r.getKey(), "8: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "9: Test String for qsTranslate", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "9: Test String for qsTranslate", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "9: Test String for qsTranslate");
         test.equal(r.getKey(), "9: Test String for qsTranslate");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "10: Test String for qsTranslateNoOp", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "10: Test String for qsTranslateNoOp", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "10: Test String for qsTranslateNoOp");
         test.equal(r.getKey(), "10: Test String for qsTranslateNoOp");
         test.equal(r.getComment(), "translation comment for webOS,");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "11: Test String for QT_TRANSLATE_NOOP", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "11: Test String for QT_TRANSLATE_NOOP", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "11: Test String for QT_TRANSLATE_NOOP");
         test.equal(r.getKey(), "11: Test String for QT_TRANSLATE_NOOP");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "12: Test String for QT_TRANSLATE_NOOP3", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "12: Test String for QT_TRANSLATE_NOOP3", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "12: Test String for QT_TRANSLATE_NOOP3");
         test.equal(r.getKey(), "12: Test String for QT_TRANSLATE_NOOP3");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "13: Test String for QT_TRANSLATE_N_NOOP", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "13: Test String for QT_TRANSLATE_N_NOOP", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "13: Test String for QT_TRANSLATE_N_NOOP");
         test.equal(r.getKey(), "13: Test String for QT_TRANSLATE_N_NOOP");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "14: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "14: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "14: Test String for qsTranslate with disambiguation");
         test.equal(r.getKey(), "14: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "15: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "15: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "15: Test String for qsTranslateNoOp with disambiguation");
         test.equal(r.getKey(), "15: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "16: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "16: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
         test.equal(r.getKey(), "16: disambiguation string");
+
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "17: single-quote string test", "x-qml"));
+        test.ok(r);
+        test.equal(r.getSource(), "17: single-quote string test");
+        test.equal(r.getKey(), "17: single-quote string test");
+
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, '18: Test "String" for qsTr', "x-qml"));
+        test.ok(r);
+        test.equal(r.getSource(), '18: Test "String" for qsTr');
+        test.equal(r.getKey(), '18: Test "String" for qsTr');
 
         test.done();
     },
@@ -946,15 +1050,15 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.equal(set.size(), 2);
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale,"\"1\": Test String for qsTr", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale,"1: Test String for qsTr", "x-qml"));
         test.ok(r);
-        test.equal(r.getSource(), "\"1\": Test String for qsTr");
-        test.equal(r.getKey(), "\"1\": Test String for qsTr");
+        test.equal(r.getSource(), "1: Test String for qsTr");
+        test.equal(r.getKey(), "1: Test String for qsTr");
         test.equal(r.getComment(), "--> main comment for the translator  --> Additional comment for the translator");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "7: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "7: disambiguation string", "x-qml"));
         test.ok(r);
-        test.equal(r.getSource(), "\"1\": Test String for qsTr");
+        test.equal(r.getSource(), "1: Test String for qsTr");
         test.equal(r.getKey(), "7: disambiguation string");
 
         var r = set.getBy({
@@ -962,7 +1066,7 @@ module.exports.qmlfile = {
         });
         test.ok(r);
 
-        test.equal(r[0].getSource(), "\"1\": Test String for qsTr");
+        test.equal(r[0].getSource(), "1: Test String for qsTr");
         test.equal(r[0].getKey(), "7: disambiguation string");
 
         test.done();
@@ -1031,82 +1135,82 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.equal(set.size(), 16);
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "1: Test String for qsTr", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "1: Test String for qsTr", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "1: Test String for qsTr");
         test.equal(r.getKey(), "1: Test String for qsTr");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "2: Test String for qsTrNoOp", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "2: Test String for qsTrNoOp", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "2: Test String for qsTrNoOp");
         test.equal(r.getKey(), "2: Test String for qsTrNoOp");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "3: Test String for QT_TR_NOOP", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "3: Test String for QT_TR_NOOP", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "3: Test String for QT_TR_NOOP");
         test.equal(r.getKey(), "3: Test String for QT_TR_NOOP");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "4: Test String for QT_TR_N_NOOP", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "4: Test String for QT_TR_N_NOOP", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "4: Test String for QT_TR_N_NOOP");
         test.equal(r.getKey(), "4: Test String for QT_TR_N_NOOP");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "5: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "5: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "5: Test String for qsTr with disambiguation");
         test.equal(r.getKey(), "5: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "6: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "6: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "6: Test String for qsTrNoOp with disambiguation");
         test.equal(r.getKey(), "6: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "7: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "7: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "7: Test String for QT_TR_NOOP with disambiguation");
         test.equal(r.getKey(), "7: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "8: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "8: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "8: Test String for QT_TR_N_NOOP with disambiguation");
         test.equal(r.getKey(), "8: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "9: Test String for qsTranslate", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "9: Test String for qsTranslate", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "9: Test String for qsTranslate");
         test.equal(r.getKey(), "9: Test String for qsTranslate");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "10: Test String for qsTranslateNoOp", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "10: Test String for qsTranslateNoOp", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "10: Test String for qsTranslateNoOp");
         test.equal(r.getKey(), "10: Test String for qsTranslateNoOp");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "11: Test String for QT_TRANSLATE_NOOP", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "11: Test String for QT_TRANSLATE_NOOP", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "11: Test String for QT_TRANSLATE_NOOP");
         test.equal(r.getKey(), "11: Test String for QT_TRANSLATE_NOOP");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "12: Test String for QT_TRANSLATE_NOOP3", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "12: Test String for QT_TRANSLATE_NOOP3", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "12: Test String for QT_TRANSLATE_NOOP3");
         test.equal(r.getKey(), "12: Test String for QT_TRANSLATE_NOOP3");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "13: Test String for QT_TRANSLATE_N_NOOP", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "13: Test String for QT_TRANSLATE_N_NOOP", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "13: Test String for QT_TRANSLATE_N_NOOP");
         test.equal(r.getKey(), "13: Test String for QT_TRANSLATE_N_NOOP");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "14: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "14: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "14: Test String for qsTranslate with disambiguation");
         test.equal(r.getKey(), "14: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "15: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "15: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "15: Test String for qsTranslateNoOp with disambiguation");
         test.equal(r.getKey(), "15: disambiguation string");
 
-        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "16: disambiguation string", "qml"));
+        var r = set.get(ResourceString.hashKey("app", set.sourceLocale, "16: disambiguation string", "x-qml"));
         test.ok(r);
         test.equal(r.getSource(), "16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
         test.equal(r.getKey(), "16: disambiguation string");
