@@ -119,6 +119,8 @@ QMLFileType.prototype.write = function(translations, locales) {
                         r.reskey = res.reskey;
                     }
 
+                    // To keep the extracted source's filename.  If not, xliff file name will be wrote to ts resource file.
+                    r.pathName = res.getPath();
                     file = resFileType.getResourceFile(locale);
                     file.addResource(r);
                     logger.trace("Added " + r.reskey + " to " + file.pathName);
