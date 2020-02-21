@@ -156,7 +156,9 @@ QMLFileType.prototype.getDataType = function() {
 };
 
 QMLFileType.prototype.getResourceTypes = function() {
-    return {};
+    return {
+        "string": "contextString"
+    };
 };
 
 /**

@@ -21,6 +21,7 @@ var fs = require("fs");
 var path = require("path");
 var log4js = require("log4js");
 var logger = log4js.getLogger("loctool.plugin.QMLFile");
+var ContextResourceString = require("loctool/lib/ContextResourceString.js");
 
 /**
  * Create a new QML file with the given path name and within
@@ -82,6 +83,12 @@ QMLFile.trimComment = function(commentString) {
     return trimComment;
 }
 
+QMLFile.makeContextValue = function(fullpath) {
+    if (!fullpath) return;
+    var path = fullpath.replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
+    return path;
+};
+
 var reqsTrString = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
 var reqsTrWithDisambiguation = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
 var reqsTranslateString = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP|QT_TRANSLATE_NOOP3|QT_TRANSLATE_N_NOOP)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
@@ -127,8 +134,7 @@ QMLFile.prototype.parse = function(data) {
             comment = commentArr.join(" ");
 
             match = QMLFile.unescapeString(match);
-
-            var r = this.API.newResource({
+            var params = {
                 resType: "string",
                 project: this.project.getProjectId(),
                 key: match,
@@ -139,8 +145,11 @@ QMLFile.prototype.parse = function(data) {
                 state: "new",
                 comment: QMLFile.trimComment(comment),
                 datatype: this.type.datatype,
-                index: this.resourceIndex++
-            });
+                index: this.resourceIndex++,
+                context: QMLFile.makeContextValue(this.pathName)
+            }
+            var r = new ContextResourceString(params);
+            /*var r = this.API.newResource();*/
             this.set.add(r);
         } else {
             logger.warn("Warning: Bogus empty string in get string call: ");
@@ -176,7 +185,7 @@ QMLFile.prototype.parse = function(data) {
             match = QMLFile.unescapeString(match);
             key = QMLFile.unescapeString(key);
 
-            var r = this.API.newResource({
+            var params = {
                 resType: "string",
                 project: this.project.getProjectId(),
                 key: key,
@@ -187,8 +196,10 @@ QMLFile.prototype.parse = function(data) {
                 state: "new",
                 comment: QMLFile.trimComment(comment),
                 datatype: this.type.datatype,
-                index: this.resourceIndex++
-            });
+                index: this.resourceIndex++,
+                context: QMLFile.makeContextValue(this.pathName)
+            };
+            var r = new ContextResourceString(params);
 
             this.set.add(r);
         } else {
@@ -223,7 +234,7 @@ QMLFile.prototype.parse = function(data) {
 
             match = QMLFile.unescapeString(match);
 
-            var r = this.API.newResource({
+            var params = {
                 resType: "string",
                 project: this.project.getProjectId(),
                 key: match,
@@ -234,8 +245,10 @@ QMLFile.prototype.parse = function(data) {
                 state: "new",
                 comment: QMLFile.trimComment(comment),
                 datatype: this.type.datatype,
-                index: this.resourceIndex++
-            });
+                index: this.resourceIndex++,
+                context: QMLFile.makeContextValue(this.pathName)
+            };
+            var r = new ContextResourceString(params);
             this.set.add(r);
         } else {
             logger.warn("Warning: Bogus empty string in get string call: ");
@@ -273,7 +286,7 @@ QMLFile.prototype.parse = function(data) {
 
             match = QMLFile.unescapeString(match);
 
-            var r = this.API.newResource({
+            var params ={
                 resType: "string",
                 project: this.project.getProjectId(),
                 key: key,
@@ -284,8 +297,10 @@ QMLFile.prototype.parse = function(data) {
                 state: "new",
                 comment: QMLFile.trimComment(comment),
                 datatype: this.type.datatype,
-                index: this.resourceIndex++
-            });
+                index: this.resourceIndex++,
+                context: QMLFile.makeContextValue(this.pathName)
+            };
+            var r = new ContextResourceString(params);
             this.set.add(r);
         } else {
             logger.warn("Warning: Bogus empty string in get string call: ");
