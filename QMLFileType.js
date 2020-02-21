@@ -21,6 +21,7 @@ var fs = require("fs");
 var log4js = require("log4js");
 var QMLFile = require("./QMLFile.js");
 var TSResourceFileType = require("ilib-loctool-webos-ts-resource");
+var ContextResourceString = require("loctool/lib/ContextResourceString");
 var logger = log4js.getLogger("loctool.plugin.QMLFileType");
 
 var QMLFileType = function(project) {
@@ -92,9 +93,11 @@ QMLFileType.prototype.write = function(translations, locales) {
         // for each extracted string, write out the translations of it
         translationLocales.forEach(function(locale) {
             logger.trace("Localizing QML strings to " + locale);
+            var manipulateKey = res.cleanHashKeyForTranslation(locale).replace(res.getContext(),"");
 
-            db.getResourceByCleanHashKey(res.cleanHashKeyForTranslation(locale), function(err, translated) {
+            db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
                 var r = translated;
+
                 if (!translated || ( this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getSource()) &&
                     this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getKey()))) {
                     if (r) {
@@ -118,11 +121,14 @@ QMLFileType.prototype.write = function(translations, locales) {
                         r = r.clone();
                         r.reskey = res.reskey;
                     }
+                    var storeResoure = r.clone();
 
                     // To keep the extracted source's filename.  If not, xliff file name will be wrote to ts resource file.
-                    r.pathName = res.getPath();
+                    storeResoure.pathName = res.getPath();
+                    storeResoure.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
+
                     file = resFileType.getResourceFile(locale);
-                    file.addResource(r);
+                    file.addResource(storeResoure);
                     logger.trace("Added " + r.reskey + " to " + file.pathName);
                 }
             }.bind(this));
@@ -157,7 +163,7 @@ QMLFileType.prototype.getDataType = function() {
 
 QMLFileType.prototype.getResourceTypes = function() {
     return {
-        "string": "contextString"
+        "string": "ContextResourceString"
     };
 };
 
