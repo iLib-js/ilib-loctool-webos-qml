@@ -21,7 +21,6 @@ var fs = require("fs");
 var path = require("path");
 var log4js = require("log4js");
 var logger = log4js.getLogger("loctool.plugin.QMLFile");
-var ContextResourceString = require("loctool/lib/ContextResourceString.js");
 
 /**
  * Create a new QML file with the given path name and within
@@ -148,7 +147,7 @@ QMLFile.prototype.parse = function(data) {
                 index: this.resourceIndex++,
                 context: QMLFile.makeContextValue(this.pathName)
             }
-            var r = new ContextResourceString(params);
+            var r = this.API.newResource(params);
             /*var r = this.API.newResource();*/
             this.set.add(r);
         } else {
@@ -199,7 +198,7 @@ QMLFile.prototype.parse = function(data) {
                 index: this.resourceIndex++,
                 context: QMLFile.makeContextValue(this.pathName)
             };
-            var r = new ContextResourceString(params);
+            var r = this.API.newResource(params);
 
             this.set.add(r);
         } else {
@@ -248,7 +247,7 @@ QMLFile.prototype.parse = function(data) {
                 index: this.resourceIndex++,
                 context: QMLFile.makeContextValue(this.pathName)
             };
-            var r = new ContextResourceString(params);
+            var r = this.API.newResource(params);
             this.set.add(r);
         } else {
             logger.warn("Warning: Bogus empty string in get string call: ");
@@ -300,7 +299,7 @@ QMLFile.prototype.parse = function(data) {
                 index: this.resourceIndex++,
                 context: QMLFile.makeContextValue(this.pathName)
             };
-            var r = new ContextResourceString(params);
+            var r = this.API.newResource(params);
             this.set.add(r);
         } else {
             logger.warn("Warning: Bogus empty string in get string call: ");

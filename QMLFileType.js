@@ -21,7 +21,6 @@ var fs = require("fs");
 var log4js = require("log4js");
 var QMLFile = require("./QMLFile.js");
 var TSResourceFileType = require("ilib-loctool-webos-ts-resource");
-var ContextResourceString = require("loctool/lib/ContextResourceString");
 var logger = log4js.getLogger("loctool.plugin.QMLFileType");
 
 var QMLFileType = function(project) {
@@ -121,14 +120,14 @@ QMLFileType.prototype.write = function(translations, locales) {
                         r = r.clone();
                         r.reskey = res.reskey;
                     }
-                    var storeResoure = r.clone();
+                    var storeResource = r.clone();
 
                     // To keep the extracted source's filename.  If not, xliff file name will be wrote to ts resource file.
-                    storeResoure.pathName = res.getPath();
-                    storeResoure.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
+                    storeResource.pathName = res.getPath();
+                    storeResource.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
 
                     file = resFileType.getResourceFile(locale);
-                    file.addResource(storeResoure);
+                    file.addResource(storeResource);
                     logger.trace("Added " + r.reskey + " to " + file.pathName);
                 }
             }.bind(this));
