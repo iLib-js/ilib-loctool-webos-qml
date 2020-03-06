@@ -26,15 +26,22 @@ if (!QMLFile) {
 
 var p = new CustomProject({
     id: "app",
-    plugins: ["../."],
-    sourceLocale: "en-US"
-}, "./test/testfiles", {
-    locales:["en-GB"]
-});
+    plugins: ["ilib-loctool-webos-qml"],
+    sourceLocale: "en-US"},
+    "./test/testfiles",
+    {
+        locales:["en-GB"]
+    });
 
 var qmlft = new QMLFileType(p);
 
+
 module.exports.qmlfile = {
+    setUp: function(callback) {
+        p.init(function(){
+            callback();
+        });
+    },
     testQMLFileConstructor: function(test) {
         test.expect(1);
 
