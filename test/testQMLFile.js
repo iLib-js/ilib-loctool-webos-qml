@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 
+var path = require("path");
+
 if (!QMLFile) {
     var QMLFile = require("../QMLFile.js");
     var QMLFileType = require("../QMLFileType.js");
@@ -26,7 +28,7 @@ if (!QMLFile) {
 
 var p = new CustomProject({
     id: "app",
-    plugins: ["ilib-loctool-webos-qml"],
+    plugins: [path.resolve(".")],
     sourceLocale: "en-US"},
     "./test/testfiles",
     {
@@ -38,9 +40,7 @@ var qmlft = new QMLFileType(p);
 
 module.exports.qmlfile = {
     setUp: function(callback) {
-        p.init(function(){
-            callback();
-        });
+        p.init(callback);
     },
     testQMLFileConstructor: function(test) {
         test.expect(1);

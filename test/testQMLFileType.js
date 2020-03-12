@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 
+var path = require("path");
+
 if (!QMLFileType) {
     var QMLFileType = require("../QMLFileType.js");
     var CustomProject =  require("loctool/lib/CustomProject.js");
@@ -24,7 +26,7 @@ if (!QMLFileType) {
 
 var p = new CustomProject({
     id: "app",
-    plugins: ["../."],
+    plugins: [path.resolve(".")],
     sourceLocale: "en-US"
 }, "./testfiles", {
     locales:["en-GB"]
