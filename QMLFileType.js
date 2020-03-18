@@ -88,46 +88,88 @@ QMLFileType.prototype.write = function(translations, locales) {
 
     for (var i = 0; i < resources.length; i++) {
         res = resources[i];
-
         // for each extracted string, write out the translations of it
         translationLocales.forEach(function(locale) {
             logger.trace("Localizing QML strings to " + locale);
-
             db.getResourceByCleanHashKey(res.cleanHashKeyForTranslation(locale), function(err, translated) {
                 var r = translated;
-                if (!translated || ( this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getSource()) &&
-                    this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getKey()))) {
-                    if (r) {
-                        logger.trace("extracted   source: " + this.API.utils.cleanString(res.getSource()));
-                        logger.trace("translation source: " + this.API.utils.cleanString(r.getSource()));
+                if (!translated) {
+                    var manipulateKey = res.cleanHashKeyForTranslation(locale).replace(res.getContext(),"");
+                    db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
+                    var r = translated;
+
+                    if (!translated || ( this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getSource()) &&
+                        this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getKey()))) {
+                        if (r) {
+                            logger.trace("extracted   source: " + this.API.utils.cleanString(res.getSource()));
+                            logger.trace("translation source: " + this.API.utils.cleanString(r.getSource()));
+                        }
+                        var note = r && 'The source string has changed. Please update the translation to match if necessary. Previous source: "' + r.getSource() + '"';
+                        var newres = res.clone();
+                        newres.setTargetLocale(locale);
+                        newres.setTarget((r && r.getTarget()) || res.getSource());
+                        newres.setState("new");
+                        newres.setComment(note);
+
+                        this.newres.add(newres);
+
+                        logger.trace("No translation for " + res.reskey + " to " + locale);
+                    } else {
+                        if (res.reskey != r.reskey) {
+                            // if reskeys don't match, we matched on cleaned string.
+                            //so we need to overwrite reskey of the translated resource to match
+                            r = r.clone();
+                            r.reskey = res.reskey;
+                        }
+                        var storeResource = r.clone();
+
+                        // To keep the extracted source's filename.  If not, xliff file name will be wrote to ts resource file.
+                        storeResource.pathName = res.getPath();
+                        storeResource.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
+
+                        file = resFileType.getResourceFile(locale);
+                        file.addResource(storeResource);
+                        logger.trace("Added " + r.reskey + " to " + file.pathName);
                     }
-                    var note = r && 'The source string has changed. Please update the translation to match if necessary. Previous source: "' + r.getSource() + '"';
-                    var newres = res.clone();
-                    newres.setTargetLocale(locale);
-                    newres.setTarget((r && r.getTarget()) || res.getSource());
-                    newres.setState("new");
-                    newres.setComment(note);
-
-                    this.newres.add(newres);
-
-                    logger.trace("No translation for " + res.reskey + " to " + locale);
+                }.bind(this));
                 } else {
-                    if (res.reskey != r.reskey) {
-                        // if reskeys don't match, we matched on cleaned string.
-                        //so we need to overwrite reskey of the translated resource to match
-                        r = r.clone();
-                        r.reskey = res.reskey;
-                    }
+                    if (( this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getSource()) &&
+                            this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getKey()))) {
+                            if (r) {
+                                logger.trace("extracted   source: " + this.API.utils.cleanString(res.getSource()));
+                                logger.trace("translation source: " + this.API.utils.cleanString(r.getSource()));
+                            }
+                            var note = r && 'The source string has changed. Please update the translation to match if necessary. Previous source: "' + r.getSource() + '"';
+                            var newres = res.clone();
+                            newres.setTargetLocale(locale);
+                            newres.setTarget((r && r.getTarget()) || res.getSource());
+                            newres.setState("new");
+                            newres.setComment(note);
 
-                    // To keep the extracted source's filename.  If not, xliff file name will be wrote to ts resource file.
-                    r.pathName = res.getPath();
-                    file = resFileType.getResourceFile(locale);
-                    file.addResource(r);
-                    logger.trace("Added " + r.reskey + " to " + file.pathName);
-                }
+                            this.newres.add(newres);
+
+                            logger.trace("No translation for " + res.reskey + " to " + locale);
+                        } else {
+                            if (res.reskey != r.reskey) {
+                                // if reskeys don't match, we matched on cleaned string.
+                                //so we need to overwrite reskey of the translated resource to match
+                                r = r.clone();
+                                r.reskey = res.reskey;
+                            }
+                            var storeResource = r.clone();
+
+                            // To keep the extracted source's filename.  If not, xliff file name will be wrote to ts resource file.
+                            storeResource.pathName = res.getPath();
+                            storeResource.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
+
+                            file = resFileType.getResourceFile(locale);
+                            file.addResource(storeResource);
+                            logger.trace("Added " + r.reskey + " to " + file.pathName);
+                        }
+                    }
+                }.bind(this));
             }.bind(this));
-        }.bind(this));
-    }
+        }
 
     resources = this.pseudo.getAll().filter(function(resource) {
         return resource.datatype === this.datatype;
@@ -156,7 +198,9 @@ QMLFileType.prototype.getDataType = function() {
 };
 
 QMLFileType.prototype.getResourceTypes = function() {
-    return {};
+    return {
+        "string": "ContextResourceString"
+    };
 };
 
 /**
