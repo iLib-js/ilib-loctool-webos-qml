@@ -24,6 +24,7 @@ if (!QMLFile) {
     var QMLFileType = require("../QMLFileType.js");
     var CustomProject =  require("loctool/lib/CustomProject.js");
     var ContextResourceString =  require("loctool/lib/ContextResourceString.js");
+    var RegularPseudo =  require("loctool/lib/RegularPseudo.js");
 }
 
 var p = new CustomProject({
@@ -1229,5 +1230,111 @@ module.exports.qmlfile = {
         test.equal(r.getKey(), "16: disambiguation string");
 
         test.done();
-    }
+    },
+    testQMLPseudoLocalization1: function(test) {
+        test.expect(6);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: "./t1.qml",
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.extract();
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 8);
+
+        var r = set.get(ContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml"));
+        test.ok(r);
+
+        test.equal(r.getSource(), "Invalid Format");
+        test.equal(r.getKey(), "Invalid Format");
+
+        var rb = new RegularPseudo();
+        var rs2 = r.generatePseudo("zxx-XX", rb);
+        test.equal(rs2.getTarget(),"Ïñvàľíð Fõŕmàţ6543210");
+        test.done();
+    },
+    testQMLPseudoLocalization2: function(test) {
+        test.expect(6);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: "./t1.qml",
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.extract();
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 8);
+
+        var r = set.get(ContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml"));
+        test.ok(r);
+
+        test.equal(r.getSource(), "Invalid Format");
+        test.equal(r.getKey(), "Invalid Format");
+
+        var rb = new RegularPseudo({
+            targetLocale: "zxx-Cyrl-XX"
+        });
+        var rs2 = r.generatePseudo("zxx-Cyrl-XX", rb);
+        test.equal(rs2.getTarget(),"Инвалид Формат6543210");
+        test.done();
+    },
+    testQMLPseudoLocalization3: function(test) {
+        test.expect(6);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: "./t1.qml",
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.extract();
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 8);
+
+        var r = set.get(ContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml"));
+        test.ok(r);
+
+        test.equal(r.getSource(), "Invalid Format");
+        test.equal(r.getKey(), "Invalid Format");
+
+        var rb = new RegularPseudo({
+            targetLocale: "zxx-Hebr-XX"
+        });
+        var rs2 = r.generatePseudo("zxx-Hebr-XX", rb);
+        test.equal(rs2.getTarget(), 'ִנבַלִד פֹרמַט6543210');
+        test.done();
+    },
+    testQMLPseudoLocalization4: function(test) {
+        test.expect(6);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: "./t1.qml",
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.extract();
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 8);
+
+        var r = set.get(ContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml"));
+        test.ok(r);
+
+        test.equal(r.getSource(), "Invalid Format");
+        test.equal(r.getKey(), "Invalid Format");
+
+        var rb = new RegularPseudo({
+            targetLocale: "zxx-Hans-XX"
+        });
+        var rs2 = r.generatePseudo("zxx-Hans-XX", rb);
+        test.equal(rs2.getTarget(),"意尼於阿了意的凡夥熱们阿推6543210");
+        test.done();
+    },
 };
