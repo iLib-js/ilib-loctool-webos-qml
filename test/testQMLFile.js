@@ -1251,7 +1251,9 @@ module.exports.qmlfile = {
         test.equal(r.getSource(), "Invalid Format");
         test.equal(r.getKey(), "Invalid Format");
 
-        var rb = new RegularPseudo();
+        var rb = new RegularPseudo({
+            type: "text"
+        });
         var rs2 = r.generatePseudo("zxx-XX", rb);
         test.equal(rs2.getTarget(),"Ïñvàľíð Fõŕmàţ6543210");
         test.done();
@@ -1277,6 +1279,7 @@ module.exports.qmlfile = {
         test.equal(r.getKey(), "Invalid Format");
 
         var rb = new RegularPseudo({
+            type: "text",
             targetLocale: "zxx-Cyrl-XX"
         });
         var rs2 = r.generatePseudo("zxx-Cyrl-XX", rb);
@@ -1304,6 +1307,7 @@ module.exports.qmlfile = {
         test.equal(r.getKey(), "Invalid Format");
 
         var rb = new RegularPseudo({
+            type: "text",
             targetLocale: "zxx-Hebr-XX"
         });
         var rs2 = r.generatePseudo("zxx-Hebr-XX", rb);
@@ -1331,6 +1335,7 @@ module.exports.qmlfile = {
         test.equal(r.getKey(), "Invalid Format");
 
         var rb = new RegularPseudo({
+            type: "text",
             targetLocale: "zxx-Hans-XX"
         });
         var rs2 = r.generatePseudo("zxx-Hans-XX", rb);
