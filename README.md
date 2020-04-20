@@ -2,6 +2,9 @@
 ilib-webos-loctool-qml is a plugin for the loctool allows it to read and localize qml files. This plugins is optimized for webOS platform.
 
 ## Release Notes
+v1.1.0
+* Used `SourceContextResourceString` in qml file string to solve an issue regarding duplicated keys are exist in the same file
+
 v1.0.0
 * Implemented to parse properly regarding resource bundle usage of qml files.
 
