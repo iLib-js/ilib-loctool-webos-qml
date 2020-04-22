@@ -217,7 +217,7 @@ QMLFileType.prototype.getDataType = function() {
 
 QMLFileType.prototype.getResourceTypes = function() {
     return {
-        "string": "ContextResourceString"
+        "string": "SourceContextResourceString"
     };
 };
 
