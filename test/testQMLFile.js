@@ -1283,7 +1283,8 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.equal(set.size(), 8);
 
-        var r = set.get(ContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml"));
+        var sourceHash = utils.hashKey("Invalid Format");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml", undefined, sourceHash));
         test.ok(r);
 
         test.equal(r.getSource(), "Invalid Format");
@@ -1309,8 +1310,8 @@ module.exports.qmlfile = {
         qf.extract();
         var set = qf.getTranslationSet();
         test.equal(set.size(), 8);
-
-        var r = set.get(ContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml"));
+        var sourceHash = utils.hashKey("Invalid Format");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml", undefined, sourceHash));
         test.ok(r);
 
         test.equal(r.getSource(), "Invalid Format");
@@ -1337,8 +1338,8 @@ module.exports.qmlfile = {
         qf.extract();
         var set = qf.getTranslationSet();
         test.equal(set.size(), 8);
-
-        var r = set.get(ContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml"));
+        var sourceHash = utils.hashKey("Invalid Format");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml", undefined, sourceHash));
         test.ok(r);
 
         test.equal(r.getSource(), "Invalid Format");
@@ -1365,8 +1366,8 @@ module.exports.qmlfile = {
         qf.extract();
         var set = qf.getTranslationSet();
         test.equal(set.size(), 8);
-
-        var r = set.get(ContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml"));
+        var sourceHash = utils.hashKey("Invalid Format");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t1", set.sourceLocale, "Invalid Format", "x-qml", undefined, sourceHash));
         test.ok(r);
 
         test.equal(r.getSource(), "Invalid Format");
