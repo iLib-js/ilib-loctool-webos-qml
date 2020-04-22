@@ -27,15 +27,33 @@ var QMLFileType = function(project) {
     this.type = "x-qml";
     this.datatype = "x-qml";
     this.resourceType = "ts";
+    this.extensions = [ ".qml"];
 
     this.project = project;
     this.API = project.getAPI();
-
-    this.extensions = [ ".qml"];
-
     this.extracted = this.API.newTranslationSet(project.getSourceLocale());
     this.newres = this.API.newTranslationSet(project.getSourceLocale());
     this.pseudo = this.API.newTranslationSet(project.getSourceLocale());
+
+    this.pseudos = {};
+
+    if (typeof project.pseudoLocale === "string") {
+        project.pseudoLocale = [project.pseudoLocale];
+    }
+
+    // generate all the pseudo bundles we'll need
+    project.pseudoLocale && project.pseudoLocale.forEach(function(locale) {
+        var pseudo = this.API.getPseudoBundle(locale, this, project);
+        if (pseudo) {
+            this.pseudos[locale] = pseudo;
+        }
+    }.bind(this));
+
+    // for use with missing strings
+    if (!project.settings.nopseudo) {
+        this.missingPseudo = this.API.getPseudoBundle(project.pseudoLocale, this, project);
+    }
+
 };
 
 /**
@@ -224,6 +242,25 @@ QMLFileType.prototype.getResourceFileType = function() {
  */
 QMLFileType.prototype.getExtracted = function() {
     return this.extracted;
+};
+
+/**
+ * Ensure that all resources collected so far have a pseudo translation.
+ */
+QMLFileType.prototype.generatePseudo = function(locale, pb) {
+    var resources = this.extracted.getBy({
+        sourceLocale: pb.getSourceLocale()
+    });
+    logger.trace("Found " + resources.length + " source resources for " + pb.getSourceLocale());
+    var resource;
+
+    resources.forEach(function(resource) {
+        logger.trace("Generating pseudo for " + resource.getKey());
+        var res = resource.generatePseudo(locale, pb);
+        if (res && res.getSource() !== res.getTarget()) {
+            this.pseudo.add(res);
+        }
+    }.bind(this));
 };
 
 /**
