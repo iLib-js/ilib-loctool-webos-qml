@@ -18,10 +18,12 @@
  */
 
 var fs = require("fs");
+var path = require("path");
 var log4js = require("log4js");
 var QMLFile = require("./QMLFile.js");
 var TSResourceFileType = require("ilib-loctool-webos-ts-resource");
 var logger = log4js.getLogger("loctool.plugin.QMLFileType");
+log4js.configure(path.dirname(module.filename) + '/log4js.json');
 
 var QMLFileType = function(project) {
     this.type = "x-qml";
