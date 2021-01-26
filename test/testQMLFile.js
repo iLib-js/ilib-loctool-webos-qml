@@ -848,7 +848,7 @@ module.exports.qmlfile = {
     },
 
     testQMLFileParseMultilineComment: function(test) {
-        test.expect(10);
+        test.expect(7);
 
         var qf = new QMLFile({
             project: p,
@@ -858,24 +858,19 @@ module.exports.qmlfile = {
 
         test.ok(qf);
         qf.parse('        \n'+
-            '    qsTr("My Channels") // i18n some comment messages... /*\n' +
+            '    qsTr("My Channels") // i18n some comment messages... \n' +
             '    //some comment messages...\n' +
-            '    //*/ qsTr("Another day")\n' +
+            '    // qsTr("Another day")\n' +
             '\n');
         var set = qf.getTranslationSet();
         test.ok(set);
-        test.equal(set.size(), 2);
+        test.equal(set.size(), 1);
 
         var r = set.getBySource("My Channels");
         test.ok(r);
         test.equal(r.getSource(), "My Channels");
         test.equal(r.getKey(), "My Channels");
         test.equal(r.getComment(), "some comment messages...");
-
-        r = set.getBySource("Another day");
-        test.ok(r);
-        test.equal(r.getSource(), "Another day");
-        test.equal(r.getKey(), "Another day");
 
         test.done();
     },
@@ -1409,5 +1404,72 @@ module.exports.qmlfile = {
         test.equal(r.getKey(), "energy");
 
         test.done();
-    }
+    },
+    testQMLFileTest7: function(test) {
+        test.expect(6);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: "./t7.qml",
+            type: qmlft
+        });
+        test.ok(qf);
+        // should attempt to read the file and not fail
+        qf.extract();
+
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 3);
+
+        var sourceHash = utils.hashKey("My Channels");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "My Channels", "x-qml", undefined, sourceHash));
+        test.ok(r);
+        test.equal(r.getSource(), "My Channels");
+        test.equal(r.getKey(), "My Channels");
+        test.equal(r.getComment(), "some comment messages...");
+
+        test.done();
+    },
+    testQMLFileNotParseCommentedParts: function(test) {
+        test.expect(2);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
+            '    /* qsTr("My Channels") // i18n some comment messages... */\n' +
+            '    //some comment messages...\n' +
+            '    // qsTr("Another day")\n' +
+            '\n');
+
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 0);
+        test.done();
+    },
+    testQMLFileNotParseCommentedParts2: function(test) {
+        test.expect(2);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
+            '    /* qsTr("Today") // i18n some comment messages... */\n' +
+            '    //some comment messages...\n' +
+            '    // qsTr("Another day")\n' +
+            '    //: qsTr("(1) Last day")\n' +
+            '    //~ qsTr("(2) Some day")\n' +
+            '    // i18n qsTr("(3) First day")\n' +
+            '\n');
+
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 3);
+        test.done();
+    },
 }
