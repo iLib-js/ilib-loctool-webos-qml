@@ -72,7 +72,7 @@ QMLFile.prototype.makeKey = function(source) {
 };
 
 /**
-* Remove single and multi-lines comments except for i18n comment style.
+* Clean up i18n comments to be displayed neatly
 *
 * @private
 * @param {String} string the string to clean
@@ -96,7 +96,7 @@ QMLFile.trimComment = function(commentString) {
  * @param {String} string the string to clean
  * @returns {String} the cleaned string
  */
-QMLFile.trimComments = function(data) {
+QMLFile.removeCommentLines = function(data) {
     if (!data) return;
     // comment style: // , /* */ single, multi line
     var trimData = data.replace(/\/\/(?!\:|\~)\s*((?!i18n).)*[$/\n]/g, "").
@@ -128,7 +128,7 @@ var reI18nExtraComment = new RegExp(/\/\/~\s+(.*)\n/);
 QMLFile.prototype.parse = function(data) {
     logger.debug("Extracting strings from " + this.pathName);
 
-    data = QMLFile.trimComments(data);
+    data = QMLFile.removeCommentLines(data);
 
     this.resourceIndex = 0;
 
