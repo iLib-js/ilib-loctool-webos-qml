@@ -1,7 +1,7 @@
 /*
  * QMLFile.js - plugin to extract resources from a QML source code file
  *
- * Copyright © 2020, JEDLSoft
+ * Copyright © 2020-2021, JEDLSoft
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,13 @@ QMLFile.prototype.makeKey = function(source) {
     return QMLFile.unescapeString(source);
 };
 
+/**
+* Clean up i18n comments to be displayed neatly
+*
+* @private
+* @param {String} string the string to clean
+* @returns {String} the cleaned string
+*/
 QMLFile.trimComment = function(commentString) {
     if (!commentString) return;
 
@@ -82,6 +89,21 @@ QMLFile.trimComment = function(commentString) {
         trim();
     return trimComment;
 }
+/**
+ * Remove single and multi-lines comments except for i18n comment style.
+ *
+ * @private
+ * @param {String} string the string to clean
+ * @returns {String} the cleaned string
+ */
+QMLFile.removeCommentLines = function(data) {
+    if (!data) return;
+    // comment style: // , /* */ single, multi line
+    var trimData = data.replace(/\/\/(?!\:|\~)\s*((?!i18n).)*[$/\n]/g, "").
+                    replace(/\/\*+([^*]|\*(?!\/))*\*+\//g, "").
+                    replace(/\/\*(.*)\*\//g, "");
+    return trimData;
+};
 
 QMLFile.makeContextValue = function(fullpath) {
     if (!fullpath) return;
@@ -105,6 +127,9 @@ var reI18nExtraComment = new RegExp(/\/\/~\s+(.*)\n/);
  */
 QMLFile.prototype.parse = function(data) {
     logger.debug("Extracting strings from " + this.pathName);
+
+    data = QMLFile.removeCommentLines(data);
+
     this.resourceIndex = 0;
 
     var match, key;
