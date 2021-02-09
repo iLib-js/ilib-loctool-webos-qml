@@ -502,7 +502,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "My Channels");
         test.equal(r.getKey(), "My Channels");
-        test.equal(r.getComment(), "General main Comment webOS Comment");
+        test.equal(r.getComment(), "webOS Comment");
 
         test.done();
     },
@@ -530,7 +530,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "My Channels");
         test.equal(r.getKey(), "My Channels");
-        test.equal(r.getComment(), "General main Comment webOS Comment General additional Comment");
+        test.equal(r.getComment(), "webOS Comment");
 
         test.done();
     },
@@ -581,7 +581,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "My Channels\n \t ...");
         test.equal(r.getKey(), "number");
-        test.equal(r.getComment(), "General main Comment info to translator");
+        test.equal(r.getComment(), "info to translator");
 
         test.done();
     },
@@ -608,7 +608,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "My Channels\n \t ...");
         test.equal(r.getKey(), "number");
-        test.equal(r.getComment(), "General main Comment info to translator");
+        test.equal(r.getComment(), "info to translator");
 
         test.done();
     },
@@ -635,7 +635,7 @@ module.exports.qmlfile = {
         var r = set.getBySource("My Channels\n \t ...");
         test.ok(r);
         test.equal(r.getSource(), "My Channels\n \t ...");
-        test.equal(r.getComment(), "comment1 comment3 comment2");
+        test.equal(r.getComment(), "comment3");
 
         test.done();
     },
@@ -1066,7 +1066,7 @@ module.exports.qmlfile = {
         test.done();
     },
     testQMLFileTest4: function(test) {
-        test.expect(12);
+        test.expect(6);
 
         var qf = new QMLFile({
             project: p,
@@ -1077,16 +1077,16 @@ module.exports.qmlfile = {
         qf.extract();
 
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 2);
+        test.equal(set.size(), 1);
 
         var sourceHash = utils.hashKey('1: Test String for qsTr');
         var r = set.get(SourceContextResourceString.hashKey("app", "t4", set.sourceLocale,"1: Test String for qsTr", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "1: Test String for qsTr");
         test.equal(r.getKey(), "1: Test String for qsTr");
-        test.equal(r.getComment(), "--> main comment for the translator  --> Additional comment for the translator");
+        test.equal(r.getComment(), "--> main comment for the translator");
 
-        sourceHash = utils.hashKey('1: Test String for qsTr');
+        /*sourceHash = utils.hashKey('1: Test String for qsTr');
         var r = set.get(SourceContextResourceString.hashKey("app", "t4", set.sourceLocale, "7: disambiguation string", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "1: Test String for qsTr");
@@ -1098,7 +1098,7 @@ module.exports.qmlfile = {
         test.ok(r);
 
         test.equal(r[0].getSource(), "1: Test String for qsTr");
-        test.equal(r[0].getKey(), "7: disambiguation string");
+        test.equal(r[0].getKey(), "7: disambiguation string");*/
 
         test.done();
     },
