@@ -50,7 +50,7 @@
     "dependencies": {
         "ilib": "^14.7.0",
         "log4js": "^5.0.0",
-        "ilib-loctool-webos-ts-resource": "1.2.2"
+        "ilib-loctool-webos-ts-resource": "1.2.3"
     },
     "devDependencies": {
         "loctool": "2.10.2",
