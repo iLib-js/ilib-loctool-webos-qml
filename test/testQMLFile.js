@@ -1084,7 +1084,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "1: Test String for qsTr");
         test.equal(r.getKey(), "1: Test String for qsTr");
-        test.equal(r.getComment(), "--> main comment for the translator");
+        test.equal(r.getComment(), "--> main comment for the translator--> Additional comment for the translator");
 
         /*sourceHash = utils.hashKey('1: Test String for qsTr');
         var r = set.get(SourceContextResourceString.hashKey("app", "t4", set.sourceLocale, "7: disambiguation string", "x-qml", undefined, sourceHash));
