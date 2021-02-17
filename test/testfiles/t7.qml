@@ -15,5 +15,12 @@ property var strings: {
         body: qsTr("Out of contract time") + _emptyString //i18n Translate only "JP"
     },*/
 }
-
+//: --> main comment for the translator
 qsTr("My Channels") // i18n some comment messages...
+
+//: --> main comment for the translator
+qsTr("Channel Locked")
+
+//: --> main comment for the translator
+//~ --> Additional comment for the translator
+qsTr("Invalid Format")
