@@ -502,7 +502,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "My Channels");
         test.equal(r.getKey(), "My Channels");
-        test.equal(r.getComment(), "General main Comment webOS Comment");
+        test.equal(r.getComment(), "webOS Comment");
 
         test.done();
     },
@@ -530,7 +530,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "My Channels");
         test.equal(r.getKey(), "My Channels");
-        test.equal(r.getComment(), "General main Comment webOS Comment General additional Comment");
+        test.equal(r.getComment(), "webOS Comment");
 
         test.done();
     },
@@ -581,7 +581,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "My Channels\n \t ...");
         test.equal(r.getKey(), "number");
-        test.equal(r.getComment(), "General main Comment info to translator");
+        test.equal(r.getComment(), "info to translator");
 
         test.done();
     },
@@ -608,7 +608,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "My Channels\n \t ...");
         test.equal(r.getKey(), "number");
-        test.equal(r.getComment(), "General main Comment info to translator");
+        test.equal(r.getComment(), "info to translator");
 
         test.done();
     },
@@ -635,7 +635,7 @@ module.exports.qmlfile = {
         var r = set.getBySource("My Channels\n \t ...");
         test.ok(r);
         test.equal(r.getSource(), "My Channels\n \t ...");
-        test.equal(r.getComment(), "comment1 comment3 comment2");
+        test.equal(r.getComment(), "comment3");
 
         test.done();
     },
@@ -1084,7 +1084,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "1: Test String for qsTr");
         test.equal(r.getKey(), "1: Test String for qsTr");
-        test.equal(r.getComment(), "--> main comment for the translator  --> Additional comment for the translator");
+        test.equal(r.getComment(), "--> main comment for the translator--> Additional comment for the translator");
 
         sourceHash = utils.hashKey('1: Test String for qsTr');
         var r = set.get(SourceContextResourceString.hashKey("app", "t4", set.sourceLocale, "7: disambiguation string", "x-qml", undefined, sourceHash));
@@ -1418,7 +1418,7 @@ module.exports.qmlfile = {
         qf.extract();
 
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 3);
+        test.equal(set.size(), 5);
 
         var sourceHash = utils.hashKey("My Channels");
         var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "My Channels", "x-qml", undefined, sourceHash));
@@ -1426,6 +1426,37 @@ module.exports.qmlfile = {
         test.equal(r.getSource(), "My Channels");
         test.equal(r.getKey(), "My Channels");
         test.equal(r.getComment(), "some comment messages...");
+
+        test.done();
+    },
+    testQMLFileTestFileComment: function(test) {
+        test.expect(10);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: "./t7.qml",
+            type: qmlft
+        });
+        test.ok(qf);
+        // should attempt to read the file and not fail
+        qf.extract();
+
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 5);
+
+        var sourceHash = utils.hashKey("Channel Locked");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "Channel Locked", "x-qml", undefined, sourceHash));
+        test.ok(r);
+        test.equal(r.getSource(), "Channel Locked");
+        test.equal(r.getKey(), "Channel Locked");
+        test.equal(r.getComment(), "--> main comment for the translator");
+
+        var sourceHash = utils.hashKey("Invalid Format");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "Invalid Format", "x-qml", undefined, sourceHash));
+        test.ok(r);
+        test.equal(r.getSource(), "Invalid Format");
+        test.equal(r.getKey(), "Invalid Format");
+        test.equal(r.getComment(), "--> main comment for the translator--> Additional comment for the translator");
 
         test.done();
     },

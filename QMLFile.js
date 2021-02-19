@@ -111,14 +111,43 @@ QMLFile.makeContextValue = function(fullpath) {
     return path;
 };
 
+QMLFile.searchbyLine = function(data, matchString) {
+    var lineNum = -1;
+    for (var i=0; i < data.length; i++) {
+        if (data[i].includes(matchString)) {
+            lineNum = i;
+            return lineNum;
+        }
+    }
+    return lineNum;
+};
+
+QMLFile.extractComments = function(data) {
+    if (!data) return;
+    var result = undefined;
+    var comment, extraComment;
+
+    data.forEach(function(item) {
+        comment = reI18nMainComment.exec(item);
+        extraComment = reI18nExtraComment.exec(item);
+        if (comment) {
+            result = comment[1];
+        }
+        if (extraComment) {
+            result = (typeof result == "undefined" ? extraComment[1] : result.concat(extraComment[1]));
+        }
+    });
+    return result;
+};
+
 var reqsTrString = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
 var reqsTrWithDisambiguation = new RegExp(/\b(qsTr|qsTrNoOp|QT_TR_NOOP|QT_TR_N_NOOP)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
 var reqsTranslateString = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP|QT_TRANSLATE_NOOP3|QT_TRANSLATE_N_NOOP)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
 var reqsTranslateStringWithDisambiguation = new RegExp(/\b(qsTranslate|qsTranslateNoOp|QT_TRANSLATE_NOOP3)\s*\(\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*,\s*("((\\"|[^"])*)"|'((\\'|[^'])*)')\s*\)/g);
 
 var reI18nwebOSComment = new RegExp(/\/(\*|\/)\s*i18n\s*(.*)($|\*\/)/);
-var reI18nMainComment = new RegExp(/\/\/:\s+(.*)\n/);
-var reI18nExtraComment = new RegExp(/\/\/~\s+(.*)\n/);
+var reI18nMainComment = new RegExp(/\/\/:\s+(.*)$/);
+var reI18nExtraComment = new RegExp(/\/\/~\s+(.*)$/);
 
 /**
  * Parse the data string looking for the localizable strings and add them to the
@@ -129,6 +158,7 @@ QMLFile.prototype.parse = function(data) {
     logger.debug("Extracting strings from " + this.pathName);
 
     data = QMLFile.removeCommentLines(data);
+    var parsebyLine = data.split("\n");
 
     this.resourceIndex = 0;
 
@@ -141,7 +171,8 @@ QMLFile.prototype.parse = function(data) {
     while (result && result.length > 3 && result[2]) {
         match = (result[2][0] === '"')? result[3]: result[5];
 
-        var comment = undefined, commentArr = [], commentResult = [];
+        var comment = undefined;
+        var preLines = [];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -150,14 +181,17 @@ QMLFile.prototype.parse = function(data) {
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTrString.lastIndex, last);
 
-            commentResult = reI18nMainComment.exec(data);
-            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
             commentwebOSResult = reI18nwebOSComment.exec(line);
-            commentArr.push((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
-            commentResult = reI18nExtraComment.exec(data);
-            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
-            comment = commentArr.join(" ");
+            comment = ((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
 
+            if (!comment) { // Extract general i18n comment following qml spec
+                var lineNum = QMLFile.searchbyLine(parsebyLine, match);
+
+                preLines.push(parsebyLine[lineNum-2]);
+                preLines.push(parsebyLine[lineNum-1]);
+
+                comment = QMLFile.extractComments(preLines);
+            }
             match = QMLFile.unescapeString(match);
             var params = {
                 resType: "string",
@@ -190,7 +224,8 @@ QMLFile.prototype.parse = function(data) {
         match = (result[2][0] === '"')? result[3]: result[5];
         key = (result[7][0] === '"')? result[8]: result[10];
 
-        var comment = undefined, commentArr = [], commentResult = [];
+        var comment = undefined;
+        var preLines = [];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -199,13 +234,17 @@ QMLFile.prototype.parse = function(data) {
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTrWithDisambiguation.lastIndex, last);
 
-            commentResult = reI18nMainComment.exec(data);
-            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
             commentwebOSResult = reI18nwebOSComment.exec(line);
-            commentArr.push((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
-            commentResult = reI18nExtraComment.exec(data);
-            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
-            comment = commentArr.join(" ");
+            comment = ((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
+
+            if (!comment) { // Extract general i18n comment following qml spec
+                var lineNum = QMLFile.searchbyLine(parsebyLine, match);
+
+                preLines.push(parsebyLine[lineNum-2]);
+                preLines.push(parsebyLine[lineNum-1]);
+
+                comment = QMLFile.extractComments(preLines);
+            }
 
             match = QMLFile.unescapeString(match);
             key = QMLFile.unescapeString(key);
@@ -240,7 +279,8 @@ QMLFile.prototype.parse = function(data) {
     while (result && result.length > 7 && result[7]) {
         match = (result[7][0] === '"')? result[8]: result[10];
 
-        var comment = undefined, commentArr = [], commentResult = [];
+        var comment = undefined;
+        var preLines = [];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -249,14 +289,17 @@ QMLFile.prototype.parse = function(data) {
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTranslateString.lastIndex, last);
 
-            commentResult = reI18nMainComment.exec(data);
-            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
             commentwebOSResult = reI18nwebOSComment.exec(line);
-            commentArr.push((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
-            commentResult = reI18nExtraComment.exec(data);
-            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
-            comment = commentArr.join(" ");
+            comment = ((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
 
+            if (!comment) { // Extract general i18n comment following qml spec
+                var lineNum = QMLFile.searchbyLine(parsebyLine, match);
+
+                preLines.push(parsebyLine[lineNum-2]);
+                preLines.push(parsebyLine[lineNum-1]);
+
+                comment = QMLFile.extractComments(preLines);
+            }
             match = QMLFile.unescapeString(match);
 
             var params = {
@@ -292,7 +335,8 @@ QMLFile.prototype.parse = function(data) {
         match = (result[7][0] === '"')? result[8]: result[10];
         key = (result[12][0] === '"')? result[13]: result[15];
 
-        var comment = undefined, commentArr = [], commentResult = [];
+        var comment = undefined;
+        var preLines = [];
 
         if (match && match.length) {
             logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -301,14 +345,17 @@ QMLFile.prototype.parse = function(data) {
             last = (last === -1) ? data.length : last;
             var line = data.substring(reqsTranslateStringWithDisambiguation.lastIndex, last);
 
-            commentResult = reI18nMainComment.exec(data);
-            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
             commentwebOSResult = reI18nwebOSComment.exec(line);
-            commentArr.push((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
-            commentResult = reI18nExtraComment.exec(data);
-            commentArr.push((commentResult && commentResult.length >= 1) ? commentResult[1] : undefined);
-            comment = commentArr.join(" ");
+            comment = ((commentwebOSResult && commentwebOSResult.length > 1) ? commentwebOSResult[2] : undefined);
 
+            if (!comment) { // Extract general i18n comment following qml spec
+                var lineNum = QMLFile.searchbyLine(parsebyLine, match);
+
+                preLines.push(parsebyLine[lineNum-2]);
+                preLines.push(parsebyLine[lineNum-1]);
+
+                comment = QMLFile.extractComments(preLines);
+            }
             match = QMLFile.unescapeString(match);
 
             var params ={

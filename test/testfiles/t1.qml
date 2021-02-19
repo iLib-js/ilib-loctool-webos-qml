@@ -9,6 +9,7 @@ QtObject {
     }
     property var strings: {
         "invalidFormat": {
+            //: --> main comment for the translator
             full: qsTr("Invalid Format") + _emptyString
         },
         "channelBlocked": {
