@@ -39,12 +39,8 @@ var QMLFileType = function(project) {
 
     this.pseudos = {};
 
-    if (typeof project.pseudoLocale === "string") {
-        project.pseudoLocale = [project.pseudoLocale];
-    }
-
     // generate all the pseudo bundles we'll need
-    project.pseudoLocale && project.pseudoLocale.forEach(function(locale) {
+    project.settings && project.settings.locales.forEach(function(locale) {
         var pseudo = this.API.getPseudoBundle(locale, this, project);
         if (pseudo) {
             this.pseudos[locale] = pseudo;
