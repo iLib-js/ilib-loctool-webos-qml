@@ -1,7 +1,7 @@
 /*
  * QMLFileType.js - Represents a collection of QML files
  *
- * Copyright (c) 2020-2021, JEDLSoft
+ * Copyright (c) 2020-2022, JEDLSoft
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ var QMLFileType = function(project) {
     this.type = "x-qml";
     this.datatype = "x-qml";
     this.resourceType = "ts";
-    this.extensions = [ ".qml"];
+    this.extensions = [ ".qml", ".js"];
 
     this.project = project;
     this.API = project.getAPI();
