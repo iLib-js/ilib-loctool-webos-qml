@@ -1,7 +1,7 @@
 /*
  * QMLFile.js - plugin to extract resources from a QML source code file
  *
- * Copyright (c) 2020-2021, JEDLSoft
+ * Copyright (c) 2020-2022, JEDLSoft
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,6 @@
 
 var fs = require("fs");
 var path = require("path");
-var log4js = require("log4js");
-log4js.configure(path.dirname(module.filename) + '/log4js.json');
-var logger = log4js.getLogger("loctool.plugin.QMLFile");
 
 /**
  * Create a new QML file with the given path name and within
@@ -37,6 +34,7 @@ var QMLFile = function(props) {
     this.pathName = props.pathName;
     this.type = props.type;
     this.API = props.project.getAPI();
+    this.logger = this.API.getLogger("loctool.plugin.webOSQmlFile");
     this.set = this.API.newTranslationSet(this.project ? this.project.sourceLocale : "zxx-XX");
 };
 
@@ -155,7 +153,7 @@ var reI18nExtraComment = new RegExp(/\/\/~\s+(.*)$/);
  * @param {String} data the string to parse
  */
 QMLFile.prototype.parse = function(data) {
-    logger.debug("Extracting strings from " + this.pathName);
+    this.logger.debug("Extracting strings from " + this.pathName);
 
     data = QMLFile.removeCommentLines(data);
     var parsebyLine = data.split("\n");
@@ -175,7 +173,7 @@ QMLFile.prototype.parse = function(data) {
         var preLines = [];
 
         if (match && match.length) {
-            logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
+            this.logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
 
             var last = data.indexOf('\n', reqsTrString.lastIndex);
             last = (last === -1) ? data.length : last;
@@ -211,8 +209,8 @@ QMLFile.prototype.parse = function(data) {
             /*var r = this.API.newResource();*/
             this.set.add(r);
         } else {
-            logger.warn("Warning: Bogus empty string in get string call: ");
-            logger.warn("... " + data.substring(result.index, reGetString.lastIndex) + " ...");
+            this.logger.warn("Warning: Bogus empty string in get string call: ");
+            this.logger.warn("... " + data.substring(result.index, reGetString.lastIndex) + " ...");
         }
         result = reqsTrString.exec(data);
     }
@@ -228,7 +226,7 @@ QMLFile.prototype.parse = function(data) {
         var preLines = [];
 
         if (match && match.length) {
-            logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
+            this.logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
 
             var last = data.indexOf('\n', reqsTrWithDisambiguation.lastIndex);
             last = (last === -1) ? data.length : last;
@@ -267,8 +265,8 @@ QMLFile.prototype.parse = function(data) {
 
             this.set.add(r);
         } else {
-            logger.warn("Warning: Bogus empty string in get string call: ");
-            logger.warn("... " + data.substring(result.index, reqsTrWithDisambiguation.lastIndex) + " ...");
+            this.logger.warn("Warning: Bogus empty string in get string call: ");
+            this.logger.warn("... " + data.substring(result.index, reqsTrWithDisambiguation.lastIndex) + " ...");
         }
         result = reqsTrWithDisambiguation.exec(data);
     }
@@ -283,7 +281,7 @@ QMLFile.prototype.parse = function(data) {
         var preLines = [];
 
         if (match && match.length) {
-            logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
+            this.logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
 
             var last = data.indexOf('\n', reqsTranslateString.lastIndex);
             last = (last === -1) ? data.length : last;
@@ -319,8 +317,8 @@ QMLFile.prototype.parse = function(data) {
             var r = this.API.newResource(params);
             this.set.add(r);
         } else {
-            logger.warn("Warning: Bogus empty string in get string call: ");
-            logger.warn("... " + data.substring(result.index, reqsTranslateString.lastIndex) + " ...");
+            this.logger.warn("Warning: Bogus empty string in get string call: ");
+            this.logger.warn("... " + data.substring(result.index, reqsTranslateString.lastIndex) + " ...");
         }
         result = reqsTranslateString.exec(data);
     }
@@ -339,7 +337,7 @@ QMLFile.prototype.parse = function(data) {
         var preLines = [];
 
         if (match && match.length) {
-            logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
+            this.logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
 
             var last = data.indexOf('\n', reqsTranslateStringWithDisambiguation.lastIndex);
             last = (last === -1) ? data.length : last;
@@ -375,8 +373,8 @@ QMLFile.prototype.parse = function(data) {
             var r = this.API.newResource(params);
             this.set.add(r);
         } else {
-            logger.warn("Warning: Bogus empty string in get string call: ");
-            logger.warn("... " + data.substring(result.index, reqsTranslateStringWithDisambiguation.lastIndex) + " ...");
+            this.logger.warn("Warning: Bogus empty string in get string call: ");
+            this.logger.warn("... " + data.substring(result.index, reqsTranslateStringWithDisambiguation.lastIndex) + " ...");
         }
         result = reqsTranslateStringWithDisambiguation.exec(data);
     }
@@ -387,7 +385,7 @@ QMLFile.prototype.parse = function(data) {
  * project's translation set.
  */
 QMLFile.prototype.extract = function() {
-    logger.debug("Extracting strings from " + this.pathName);
+    this.logger.debug("Extracting strings from " + this.pathName);
     if (this.pathName) {
         var p = path.join(this.project.root, this.pathName);
         try {
@@ -396,7 +394,7 @@ QMLFile.prototype.extract = function() {
                 this.parse(data);
             }
         } catch (e) {
-            logger.warn("Could not read file: " + p);
+            this.logger.warn("Could not read file: " + p);
         }
     }
 };

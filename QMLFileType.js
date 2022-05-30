@@ -18,11 +18,8 @@
  */
 
 var path = require("path");
-var log4js = require("log4js");
 var QMLFile = require("./QMLFile.js");
 var TSResourceFileType = require("ilib-loctool-webos-ts-resource");
-var logger = log4js.getLogger("loctool.plugin.QMLFileType");
-log4js.configure(path.dirname(module.filename) + '/log4js.json');
 
 var QMLFileType = function(project) {
     this.type = "x-qml";
@@ -35,7 +32,7 @@ var QMLFileType = function(project) {
     this.extracted = this.API.newTranslationSet(project.getSourceLocale());
     this.newres = this.API.newTranslationSet(project.getSourceLocale());
     this.pseudo = this.API.newTranslationSet(project.getSourceLocale());
-
+    this.logger = this.API.getLogger("loctool.plugin.webOSQmlFileType");
     if (typeof project.pseudoLocale === "string") {
         project.pseudoLocale = [project.pseudoLocale];
     }
@@ -76,14 +73,14 @@ var QMLFileType = function(project) {
  * otherwise
  */
 QMLFileType.prototype.handles = function(pathName) {
-    logger.debug("QMLFileType handles " + pathName + "?");
+    this.logger.debug("QMLFileType handles " + pathName + "?");
     var ret = false;
     if ((pathName.length > 4 && pathName.substring(pathName.length - 4) === ".qml") ||
         (pathName.length > 3 && pathName.substring(pathName.length - 3) === ".js")) {
         ret = true;
     } 
 
-    logger.debug(ret ? "Yes" : "No");
+    this.logger.debug(ret ? "Yes" : "No");
     return ret;
 };
 
@@ -119,7 +116,7 @@ QMLFileType.prototype.write = function(translations, locales) {
         res = resources[i];
         // for each extracted string, write out the translations of it
         translationLocales.forEach(function(locale) {
-            logger.trace("Localizing QML strings to " + locale);
+            this.logger.trace("Localizing QML strings to " + locale);
             db.getResourceByCleanHashKey(res.cleanHashKeyForTranslation(locale), function(err, translated) {
                 var r = translated;
                 if (!translated) {
@@ -130,8 +127,8 @@ QMLFileType.prototype.write = function(translations, locales) {
                     if (!translated || ( this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getSource()) &&
                         this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getKey()))) {
                         if (r) {
-                            logger.trace("extracted   source: " + this.API.utils.cleanString(res.getSource()));
-                            logger.trace("translation source: " + this.API.utils.cleanString(r.getSource()));
+                            this.logger.trace("extracted   source: " + this.API.utils.cleanString(res.getSource()));
+                            this.logger.trace("translation source: " + this.API.utils.cleanString(r.getSource()));
                         }
                         var note = r && 'The source string has changed. Please update the translation to match if necessary. Previous source: "' + r.getSource() + '"';
                         var newres = res.clone();
@@ -142,7 +139,7 @@ QMLFileType.prototype.write = function(translations, locales) {
 
                         this.newres.add(newres);
 
-                        logger.trace("No translation for " + res.reskey + " to " + locale);
+                        this.logger.trace("No translation for " + res.reskey + " to " + locale);
                     } else {
                         if (res.reskey != r.reskey) {
                             // if reskeys don't match, we matched on cleaned string.
@@ -158,15 +155,15 @@ QMLFileType.prototype.write = function(translations, locales) {
 
                         file = resFileType.getResourceFile(locale);
                         file.addResource(storeResource);
-                        logger.trace("Added " + r.reskey + " to " + file.pathName);
+                        this.logger.trace("Added " + r.reskey + " to " + file.pathName);
                     }
                 }.bind(this));
                 } else {
                     if (( this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getSource()) &&
                             this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getKey()))) {
                             if (r) {
-                                logger.trace("extracted   source: " + this.API.utils.cleanString(res.getSource()));
-                                logger.trace("translation source: " + this.API.utils.cleanString(r.getSource()));
+                                this.logger.trace("extracted   source: " + this.API.utils.cleanString(res.getSource()));
+                                this.logger.trace("translation source: " + this.API.utils.cleanString(r.getSource()));
                             }
                             var note = r && 'The source string has changed. Please update the translation to match if necessary. Previous source: "' + r.getSource() + '"';
                             var newres = res.clone();
@@ -177,7 +174,7 @@ QMLFileType.prototype.write = function(translations, locales) {
 
                             this.newres.add(newres);
 
-                            logger.trace("No translation for " + res.reskey + " to " + locale);
+                            this.logger.trace("No translation for " + res.reskey + " to " + locale);
                         } else {
                             if (res.reskey != r.reskey) {
                                 // if reskeys don't match, we matched on cleaned string.
@@ -193,7 +190,7 @@ QMLFileType.prototype.write = function(translations, locales) {
 
                             file = resFileType.getResourceFile(locale);
                             file.addResource(storeResource);
-                            logger.trace("Added " + r.reskey + " to " + file.pathName);
+                            this.logger.trace("Added " + r.reskey + " to " + file.pathName);
                         }
                     }
                 }.bind(this));
@@ -209,7 +206,7 @@ QMLFileType.prototype.write = function(translations, locales) {
         if (res.getTargetLocale() !== this.project.sourceLocale && res.getSource() !== res.getTarget()) {
             file = resFileType.getResourceFile(res.getTargetLocale());
             file.addResource(res);
-            logger.trace("Added " + res.reskey + " to " + file.pathName);
+            this.logger.trace("Added " + res.reskey + " to " + file.pathName);
         }
     }
 };
@@ -262,11 +259,11 @@ QMLFileType.prototype.generatePseudo = function(locale, pb) {
     var resources = this.extracted.getBy({
         sourceLocale: pb.getSourceLocale()
     });
-    logger.trace("Found " + resources.length + " source resources for " + pb.getSourceLocale());
+    this.logger.trace("Found " + resources.length + " source resources for " + pb.getSourceLocale());
     var resource;
 
     resources.forEach(function(resource) {
-        logger.trace("Generating pseudo for " + resource.getKey());
+        this.logger.trace("Generating pseudo for " + resource.getKey());
         var res = resource.generatePseudo(locale, pb);
         if (res && res.getSource() !== res.getTarget()) {
             this.pseudo.add(res);
