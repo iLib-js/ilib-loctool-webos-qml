@@ -98,7 +98,7 @@ QMLFile.removeCommentLines = function(data) {
     if (!data) return;
 
     // comment style: // , /* */ single, multi line
-    var trimData = data.replace(/\r(\n)*/g, "\n").  // new line character for window
+    var trimData = data.replace(/\r(\n)*/g, "\n").  // newline character for window
                     replace(/\/\/(?!\:|\~)\s*((?!i18n).)*[$/\n]/g, "").
                     replace(/\/\*+([^*]|\*(?!\/))*\*+\//g, "").
                     replace(/\/\*(.*)\*\//g, "");
