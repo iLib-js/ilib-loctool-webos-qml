@@ -1514,6 +1514,31 @@ module.exports.qmlfile = {
         test.ok(qf);
 
         qf.parse('        \n'+
+            '    /* qsTr("Today") // i18n some comment messages... */\n' +
+            '    //some comment messages...\n' +
+            '    // qsTr("Another day")\n' +
+            '    //: qsTr("(1) Last day")\r\n' +
+            '    //~ qsTr("(2) Some day")\r' +
+            '    // i18n qsTr("(3) First day")\r\n' +
+            '    // qsTr("Another day (1)")\r\n' +
+            '    // qsTr("Another day (2)")\r' +
+            '\n');
+
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 3);
+        test.done();
+    },
+    testQMLFileParseCommentedWindowStyle2: function(test) {
+        test.expect(2);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
         '    // qsTr("Another day")\n' +
         '    // qsTr("Another day (1)")\r\n' +
         '    // qsTr("Another day (2)")\r' +
@@ -1522,5 +1547,5 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.equal(set.size(), 0);
         test.done();
-    },
+    }
 }
