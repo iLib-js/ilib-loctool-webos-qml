@@ -3,9 +3,10 @@ ilib-webos-loctool-qml is a plugin for the loctool allows it to read and localiz
 
 ## Release Notes
 v1.3.6
-* updated dependencies
-* Use the logger provided by the loctool instead of using log4js directly.
-* Add node 16 version testing for circleCI ( minimum version of node is v10)
+* Updated dependencies
+* Used the logger provided by the loctool instead of using log4js directly.
+* Added node 16 version testing for circleCI ( minimum version of node is v10)
+* Fixed an issue not to filter newline character for window.
 
 v1.3.5
 * Add `js` to the list of file extensions that this plugin handles.

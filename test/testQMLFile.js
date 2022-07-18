@@ -1,7 +1,7 @@
 /*
  * testQMLFile.js - test the qml file handler object.
  *
- * Copyright (c) 2020-2021, JEDLSoft
+ * Copyright (c) 2020-2022, JEDLSoft
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1503,4 +1503,49 @@ module.exports.qmlfile = {
         test.equal(set.size(), 3);
         test.done();
     },
+    testQMLFileParseCommentedWindowStyle: function(test) {
+        test.expect(2);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
+            '    /* qsTr("Today") // i18n some comment messages... */\n' +
+            '    //some comment messages...\n' +
+            '    // qsTr("Another day")\n' +
+            '    //: qsTr("(1) Last day")\r\n' +
+            '    //~ qsTr("(2) Some day")\r' +
+            '    // i18n qsTr("(3) First day")\r\n' +
+            '    // qsTr("Another day (1)")\r\n' +
+            '    // qsTr("Another day (2)")\r' +
+            '\n');
+
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 3);
+        test.done();
+    },
+    testQMLFileParseCommentedWindowStyle2: function(test) {
+        test.expect(2);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
+        '    // qsTr("Another day")\n' +
+        '    // qsTr("Another day (1)")\r\n' +
+        '    // qsTr("Another day (2)")\r' +
+        '\n');
+
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 0);
+        test.done();
+    }
 }
