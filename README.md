@@ -2,20 +2,19 @@
 ilib-webos-loctool-qml is a plugin for the loctool allows it to read and localize qml files. This plugins is optimized for webOS platform.
 
 ## Release Notes
-v1.3.6
-* Updated dependencies
-* Used the logger provided by the loctool instead of using log4js directly.
-* Added node 16 version testing for circleCI ( minimum version of node is v10)
-* Fixed an issue not to filter newline character for window.
 
 v1.3.5
-* Add `js` to the list of file extensions that this plugin handles.
+* Updated dependencies. (loctool: 2.16.3)
+* Added node 16 version testing for circleCI. ( minimum version of node is v10.0.0)
+* Added `js` to the list of file extensions that this plugin handles.
+* Used the logger provided by the loctool instead of using log4js directly.
+* Fixed an issue not to filter newline character for window.
 
 v1.3.4
 * Updated dependent module version to have the latest one. (loctool: 2.16.2)
 
 v1.3.3
-* Fix pseudo localization to work properly
+* Fixed pseudo localization to work properly
 * Updated dependent module version to have the latest one. (loctool: 2.14.1)
 
 v1.3.2
@@ -30,7 +29,7 @@ v1.3.0
 
 v1.2.0
 * Removed commented lines before parsing so that strings in the comments will not be extracted.
-* Update dependent module version to have the latest one.
+* Updated dependent module version to have the latest one.
 
 v1.1.1
 * Updated code to print log with log4js.
@@ -38,7 +37,6 @@ v1.1.1
 v1.1.0
 * Implemented to pseudo localization properly.
 * Used `SourceContextResourceString` in qml file string to solve an issue regarding duplicated keys are exist in the same file
-
 
 v1.0.0
 * Implemented to parse properly regarding resource bundle usage of qml files.
