@@ -111,20 +111,42 @@ QMLFileType.prototype.write = function(translations, locales) {
         translationLocales = locales.filter(function(locale) {
             return locale !== this.project.sourceLocale && locale !== this.project.pseudoLocale;
         }.bind(this));
+    var customInheritLocale;
 
     for (var i = 0; i < resources.length; i++) {
         res = resources[i];
         // for each extracted string, write out the translations of it
         translationLocales.forEach(function(locale) {
             this.logger.trace("Localizing QML strings to " + locale);
+            customInheritLocale = this.project.getLocaleInherit(locale);
+
             db.getResourceByCleanHashKey(res.cleanHashKeyForTranslation(locale), function(err, translated) {
                 var r = translated;
                 if (!translated) {
                     var manipulateKey = res.cleanHashKeyForTranslation(locale).replace(res.getContext(),"");
                     db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
                     var r = translated;
-
-                    if (!translated || ( this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getSource()) &&
+                    if (!translated && customInheritLocale) {
+                        var manipulateKey = res.cleanHashKeyForTranslation(customInheritLocale).replace(res.getContext(),"");
+                        db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
+                            var r = translated;
+                            if (translated){
+                                var storeResource = r.clone();
+                                storeResource.pathName = res.getPath();
+                                storeResource.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
+                                storeResource.setTargetLocale(locale);
+                                file = resFileType.getResourceFile(locale);
+                                file.addResource(storeResource);
+                            } else {
+                                var newres = res.clone();
+                                newres.setTargetLocale(locale);
+                                newres.setTarget((r && r.getTarget()) || res.getSource());
+                                newres.setState("new");
+                                this.newres.add(newres);
+                                this.logger.trace("No translation for " + res.reskey + " to " + locale);
+                            }
+                        }.bind(this));
+                    } else if (!translated || ( this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getSource()) &&
                         this.API.utils.cleanString(res.getSource()) !== this.API.utils.cleanString(r.getKey()))) {
                         if (r) {
                             this.logger.trace("extracted   source: " + this.API.utils.cleanString(res.getSource()));
