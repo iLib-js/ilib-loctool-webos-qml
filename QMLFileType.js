@@ -21,6 +21,7 @@ var fs = require("fs");
 var path = require("path");
 var QMLFile = require("./QMLFile.js");
 var TSResourceFileType = require("ilib-loctool-webos-ts-resource");
+var ResourceString = require("loctool/lib/ResourceString.js");
 
 var QMLFileType = function(project) {
     this.type = "x-qml";
@@ -132,21 +133,18 @@ QMLFileType.prototype.write = function(translations, locales) {
             db.getResourceByCleanHashKey(res.cleanHashKeyForTranslation(locale), function(err, translated) {
                 var r = translated;
                 if (!translated) {
-                    var manipulateKey = res.cleanHashKeyForTranslation(locale).replace(res.getContext(),"");
+                    var manipulateKey = res.cleanHashKeyForTranslation(locale).replace(res.getContext(), "");
                     db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
                     var r = translated;
 
                     if (!translated && this.isloadCommonData) {
-                        var manipulateKey = res.cleanHashKeyForTranslation(locale).
-                                        replace("scrs_", "rs_").
-                                        replace(res.getContext()+"_", "").
-                                        replace("_"+ res.sourcehash, "").
-                                        replace(res.getProject(), this.commonPrjName).
-                                        replace("_" + res.getDataType() + "_", "_" + this.commonPrjType + "_");
+                        var manipulateKey = ResourceString.hashKey(this.commonPrjName, locale, res.getKey(), this.commonPrjType, res.getFlavor());
                         db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
                             if (translated) {
                                 translated.project = res.getProject();
                                 translated.datatype=res.getDataType();
+                                translated.pathName = res.getPath();
+                                translated.context = res.getContext();
                                 file = resFileType.getResourceFile(locale);
                                 file.addResource(translated);
                             } else if(!translated && customInheritLocale){
