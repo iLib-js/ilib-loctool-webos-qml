@@ -119,7 +119,7 @@ QMLFileType.prototype.write = function(translations, locales) {
     var customInheritLocale;
 
     if (this.commonPath && !this.isloadCommonData) {
-        this._loadCommonXliff(translationLocales);
+        this._loadCommonXliff();
         this.isloadCommonData = true;
     }
 
@@ -141,18 +141,23 @@ QMLFileType.prototype.write = function(translations, locales) {
                         var manipulateKey = ResourceString.hashKey(this.commonPrjName, locale, res.getKey(), this.commonPrjType, res.getFlavor());
                         db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
                             if (translated) {
-                                translated.project = res.getProject();
-                                translated.datatype=res.getDataType();
-                                translated.pathName = res.getPath();
-                                translated.context = res.getContext();
+                                var storeResource = translated.clone();
+                                storeResource.project = res.getProject();
+                                storeResource.datatype = res.getDataType();
+                                storeResource.pathName = res.getPath();
+                                storeResource.context = res.getContext();
                                 file = resFileType.getResourceFile(locale);
-                                file.addResource(translated);
+                                file.addResource(storeResource);
                             } else if(!translated && customInheritLocale){
-                                db.getResourceByCleanHashKey(res.cleanHashKeyForTranslation(customInheritLocale), function(err, translated) {
+                                var manipulateKey = res.cleanHashKeyForTranslation(customInheritLocale).replace(res.getContext(), "");
+                                db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
                                     if (translated){
-                                        translated.setTargetLocale(locale);
+                                        var storeResource = translated.clone();
+                                        storeResource.setTargetLocale(locale);
+                                        storeResource.pathName = res.getPath();
+                                        storeResource.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
                                         file = resFileType.getResourceFile(locale);
-                                        file.addResource(translated);
+                                        file.addResource(storeResource);
                                     } else {
                                         var newres = res.clone();
                                         newres.setTargetLocale(locale);
@@ -284,25 +289,27 @@ QMLFileType.prototype._loadCommonXliff = function() {
     if (fs.existsSync(this.commonPath)){
         var list = fs.readdirSync(this.commonPath);
     }
-    list.forEach(function(file){
-        var commonXliff = this.API.newXliff({
-            sourceLocale: this.project.getSourceLocale(),
-            project: this.project.getProjectId(),
-            path: this.commonPath,
-        });
-        var pathName = path.join(this.commonPath, file);
-        var data = fs.readFileSync(pathName, "utf-8");
-        commonXliff.deserialize(data);
-        var resources = commonXliff.getResources();
-        var localts = this.project.getRepository().getTranslationSet();
-        if (resources.length > 0){
-            this.commonPrjName = resources[0].getProject();
-            this.commonPrjType = resources[0].getDataType();
-            resources.forEach(function(res){
-                localts.add(res);
-            }.bind(this));
-        }
-    }.bind(this));
+    if (list && list.length !== 0) {
+        list.forEach(function(file){
+            var commonXliff = this.API.newXliff({
+                sourceLocale: this.project.getSourceLocale(),
+                project: this.project.getProjectId(),
+                path: this.commonPath,
+            });
+            var pathName = path.join(this.commonPath, file);
+            var data = fs.readFileSync(pathName, "utf-8");
+            commonXliff.deserialize(data);
+            var resources = commonXliff.getResources();
+            var localts = this.project.getRepository().getTranslationSet();
+            if (resources.length > 0){
+                this.commonPrjName = resources[0].getProject();
+                this.commonPrjType = resources[0].getDataType();
+                resources.forEach(function(res){
+                    localts.add(res);
+                }.bind(this));
+            }
+        }.bind(this));
+    }
 };
 
 QMLFileType.prototype.newFile = function(path) {
