@@ -157,16 +157,23 @@ QMLFileType.prototype.write = function(translations, locales) {
                             } else if(!translated && customInheritLocale){
                                 var manipulateKey = res.cleanHashKeyForTranslation(customInheritLocale).replace(res.getContext(), "");
                                 db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
-                                    if (translated){
-                                        this._addResource(resFileType, translated, res, locale);
+                                    if (!translated){
+                                        var manipulateKey = ResourceString.hashKey(this.commonPrjName, customInheritLocale, res.getKey(), this.commonPrjType, res.getFlavor());
+                                        db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
+                                            if (translated){
+                                                this._addResource(resFileType, translated, res, locale);
+                                            } else {
+                                                var newres = res.clone();
+                                                newres.setTargetLocale(locale);
+                                                newres.setTarget((r && r.getTarget()) || res.getSource());
+                                                newres.setState("new");
+                                                newres.setComment(note);
+                                                this.newres.add(newres);
+                                                this.logger.trace("No translation for " + res.reskey + " to " + locale);
+                                            }
+                                        }.bind(this));
                                     } else {
-                                        var newres = res.clone();
-                                        newres.setTargetLocale(locale);
-                                        newres.setTarget((r && r.getTarget()) || res.getSource());
-                                        newres.setState("new");
-                                        newres.setComment(note);
-                                        this.newres.add(newres);
-                                        this.logger.trace("No translation for " + res.reskey + " to " + locale);
+                                        this._addResource(resFileType, translated, res, locale);
                                     }
                                 }.bind(this));
                             } else {
