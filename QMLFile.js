@@ -1,7 +1,7 @@
 /*
  * QMLFile.js - plugin to extract resources from a QML source code file
  *
- * Copyright (c) 2020-2022, JEDLSoft
+ * Copyright (c) 2020-2023, JEDLSoft
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,8 @@ QMLFile.unescapeString = function(string) {
         replace(/([^\\])\\\\/g, "$1\\").
         replace(/^\\"/, '"').
         replace(/([^\\])\\"/g, '$1"').
-        replace(/\\"/g, '"');
+        replace(/\\"/g, '"').
+        replace(/\\'/g, "'");
     return unescaped;
 };
 

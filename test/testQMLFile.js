@@ -1377,7 +1377,7 @@ module.exports.qmlfile = {
         test.done();
     },
     testQMLFileTest6: function(test) {
-        test.expect(8);
+        test.expect(11);
 
         var qf = new QMLFile({
             project: p,
@@ -1389,7 +1389,7 @@ module.exports.qmlfile = {
         qf.extract();
 
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 2);
+        test.equal(set.size(), 3);
 
         var sourceHash = utils.hashKey("Minimum");
         var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "energy", "x-qml", undefined, sourceHash));
@@ -1402,6 +1402,12 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "Maximum");
         test.equal(r.getKey(), "energy");
+
+        var sourceHash = utils.hashKey("Don\'t save");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "Don\'t save", "x-qml", undefined, sourceHash));
+        test.ok(r);
+        test.equal(r.getSource(), "Don't save");
+        test.equal(r.getKey(), "Don't save");
 
         test.done();
     },
@@ -1546,6 +1552,24 @@ module.exports.qmlfile = {
 
         var set = qf.getTranslationSet();
         test.equal(set.size(), 0);
+        test.done();
+    },
+    testQMLFileParseSingleQuote: function(test) {
+        test.expect(2);
+
+        var qf = new QMLFile({
+            project: p,
+            pathName: undefined,
+            type: qmlft
+        });
+        test.ok(qf);
+
+        qf.parse('        \n'+
+        '    qsTr("Don\'t save");\n' +
+        '\n');
+
+        var set = qf.getTranslationSet();
+        test.equal(set.size(), 1);
         test.done();
     }
 }

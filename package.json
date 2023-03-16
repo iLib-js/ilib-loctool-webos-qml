@@ -1,6 +1,6 @@
 {
     "name": "ilib-loctool-webos-qml",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "main": "./QMLFileType.js",
     "description": "A loctool plugin that knows how to process qml files",
     "license": "Apache-2.0",
