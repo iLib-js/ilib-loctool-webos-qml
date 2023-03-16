@@ -1409,11 +1409,11 @@ module.exports.qmlfile = {
         test.equal(r.getSource(), "Don't save");
         test.equal(r.getKey(), "Don't save");
 
-        var sourceHash = utils.hashKey("\' hello\' there");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "\' hello\' there", "x-qml", undefined, sourceHash));
+        var sourceHash = utils.hashKey("\'hello\' there");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "\'hello\' there", "x-qml", undefined, sourceHash));
         test.ok(r);
-        test.equal(r.getSource(), "' hello' there");
-        test.equal(r.getKey(), "' hello' there");
+        test.equal(r.getSource(), "'hello' there");
+        test.equal(r.getKey(), "'hello' there");
 
         test.done();
     },
