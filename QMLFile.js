@@ -52,6 +52,7 @@ QMLFile.unescapeString = function(string) {
         replace(/^\\\\/, "\\").             // unescape backslashes
         replace(/([^\\])\\\\/g, "$1\\").
         replace(/^\\"/, '"').
+        replace(/^\\'/, "'").
         replace(/([^\\])\\"/g, '$1"').
         replace(/\\"/g, '"').
         replace(/\\'/g, "'");
