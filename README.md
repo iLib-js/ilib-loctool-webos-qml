@@ -3,7 +3,7 @@ ilib-webos-loctool-qml is a plugin for the loctool allows it to read and localiz
 
 ## Release Notes
 v1.5.1
-* Fixed an issue where didn't handle single quotes properly.
+* Fixed issues where didn't handle single quotes and multi-line properly.
 
 v1.5.0
 * Updated dependencies. (loctool: 2.20.2)

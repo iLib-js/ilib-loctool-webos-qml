@@ -1418,7 +1418,7 @@ module.exports.qmlfile = {
         test.done();
     },
     testQMLFileTest7: function(test) {
-        test.expect(6);
+        test.expect(9);
 
         var qf = new QMLFile({
             project: p,
@@ -1430,7 +1430,7 @@ module.exports.qmlfile = {
         qf.extract();
 
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 5);
+        test.equal(set.size(), 6);
 
         var sourceHash = utils.hashKey("My Channels");
         var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "My Channels", "x-qml", undefined, sourceHash));
@@ -1438,6 +1438,12 @@ module.exports.qmlfile = {
         test.equal(r.getSource(), "My Channels");
         test.equal(r.getKey(), "My Channels");
         test.equal(r.getComment(), "some comment messages...");
+
+        var sourceHash = utils.hashKey("Network is not connected.\nPlease check the Network Settings and try again.");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "Network is not connected.\nPlease check the Network Settings and try again.", "x-qml", undefined, sourceHash));
+        test.ok(r);
+        test.equal(r.getSource(), "Network is not connected.\nPlease check the Network Settings and try again.");
+        test.equal(r.getKey(), "Network is not connected.\nPlease check the Network Settings and try again.");
 
         test.done();
     },
@@ -1454,7 +1460,7 @@ module.exports.qmlfile = {
         qf.extract();
 
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 5);
+        test.equal(set.size(), 6);
 
         var sourceHash = utils.hashKey("Channel Locked");
         var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "Channel Locked", "x-qml", undefined, sourceHash));
