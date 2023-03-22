@@ -1,7 +1,7 @@
 /*
  * testQMLFile.js - test the qml file handler object.
  *
- * Copyright (c) 2020-2022, JEDLSoft
+ * Copyright (c) 2020-2023, JEDLSoft
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1418,7 +1418,7 @@ module.exports.qmlfile = {
         test.done();
     },
     testQMLFileTest7: function(test) {
-        test.expect(9);
+        test.expect(12);
 
         var qf = new QMLFile({
             project: p,
@@ -1430,7 +1430,7 @@ module.exports.qmlfile = {
         qf.extract();
 
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 6);
+        test.equal(set.size(), 7);
 
         var sourceHash = utils.hashKey("My Channels");
         var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "My Channels", "x-qml", undefined, sourceHash));
@@ -1444,6 +1444,12 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "Network is not connected.\nPlease check the Network Settings and try again.");
         test.equal(r.getKey(), "Network is not connected.\nPlease check the Network Settings and try again.");
+
+        var sourceHash = utils.hashKey("hello \n Nice \n to meet \n you.");
+        var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "hello \n Nice \n to meet \n you.", "x-qml", undefined, sourceHash));
+        test.ok(r);
+        test.equal(r.getSource(), "hello \n Nice \n to meet \n you.");
+        test.equal(r.getKey(), "hello \n Nice \n to meet \n you.");
 
         test.done();
     },
@@ -1460,7 +1466,7 @@ module.exports.qmlfile = {
         qf.extract();
 
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 6);
+        test.equal(set.size(), 7);
 
         var sourceHash = utils.hashKey("Channel Locked");
         var r = set.get(SourceContextResourceString.hashKey("app", "t7", set.sourceLocale, "Channel Locked", "x-qml", undefined, sourceHash));
