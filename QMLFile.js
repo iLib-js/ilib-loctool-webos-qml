@@ -53,7 +53,8 @@ QMLFile.unescapeString = function(string) {
         replace(/([^\\])\\\\/g, "$1\\").
         replace(/([^\\])\\"/g, '$1"').
         replace(/\\"/g, '"').
-        replace(/\\'/g, "'");
+        replace(/\\'/g, "'").
+        replace(/\\n/g, "\n");
     return unescaped;
 };
 
