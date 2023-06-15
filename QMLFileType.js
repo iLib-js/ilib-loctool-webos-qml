@@ -130,7 +130,7 @@ QMLFileType.prototype.write = function(translations, locales) {
         }.bind(this));
     var customInheritLocale;
 
-    if ((typeof(translations) !== 'undefined') && (typeof(translations.getProjects()) !== 'undefined') && (translations.getProjects().includes("common"))) {
+    if ((typeof(translations) !== 'undefined') && (typeof(translations.getProjects()) !== 'undefined') && (translations.getProjects().indexOf("common") !== -1)) {
         this.isloadCommonData = true;
     }
 
