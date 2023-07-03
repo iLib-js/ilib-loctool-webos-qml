@@ -130,9 +130,17 @@ QMLFileType.prototype.write = function(translations, locales) {
         }.bind(this));
     var customInheritLocale;
 
-    if (this.commonPath && !this.isloadCommonData) {
-        this._loadCommonXliff();
+    if ((typeof(translations) !== 'undefined') && (typeof(translations.getProjects()) !== 'undefined') && (translations.getProjects().indexOf("common") !== -1)) {
         this.isloadCommonData = true;
+    }
+
+    if (this.commonPath) {
+        if (!this.isloadCommonData) {
+            this._loadCommonXliff();
+            this.isloadCommonData = true;
+        } else {
+            this._addComonDatatoTranslationSet(translations);
+        }
     }
 
     for (var i = 0; i < resources.length; i++) {
@@ -283,6 +291,18 @@ QMLFileType.prototype.write = function(translations, locales) {
         }
     }
 };
+
+QMLFileType.prototype._addComonDatatoTranslationSet = function(tsdata) {
+    var prots = this.project.getRepository().getTranslationSet();
+    var commonts = tsdata.getBy({project: "common"});
+    if (commonts.length > 0){
+        this.commonPrjName = commonts[0].getProject();
+        this.commonPrjType = commonts[0].getDataType();
+        commonts.forEach(function(ts){
+            prots.add(ts);
+        }.bind(this));
+    }
+}
 
 QMLFileType.prototype._loadCommonXliff = function() {
     if (fs.existsSync(this.commonPath)){
