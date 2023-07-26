@@ -164,6 +164,7 @@ QMLFile.prototype.parse = function(data) {
     this.resourceIndex = 0;
 
     var match, key;
+    var paramContext = undefined;
 
     // To extract resBundle_qsTr()
     reqsTrString.lastIndex = 0; // just to be safe
@@ -282,6 +283,7 @@ QMLFile.prototype.parse = function(data) {
 
         var comment = undefined;
         var preLines = [];
+        paramContext = (result[2][0] === '"')? result[3]: result[5];
 
         if (match && match.length) {
             this.logger.trace("Found string key: " + this.makeKey(match) + ", string: '" + match + "'");
@@ -315,7 +317,7 @@ QMLFile.prototype.parse = function(data) {
                 comment: QMLFile.trimComment(comment),
                 datatype: this.type.datatype,
                 index: this.resourceIndex++,
-                context: QMLFile.makeContextValue(this.pathName)
+                context: paramContext || QMLFile.makeContextValue(this.pathName)
             };
             var r = this.API.newResource(params);
             this.set.add(r);
@@ -335,6 +337,7 @@ QMLFile.prototype.parse = function(data) {
 
         match = (result[7][0] === '"')? result[8]: result[10];
         key = (result[12][0] === '"')? result[13]: result[15];
+        paramContext = (result[2][0] === '"')? result[3]: result[5];
 
         var comment = undefined;
         var preLines = [];
@@ -371,7 +374,7 @@ QMLFile.prototype.parse = function(data) {
                 comment: QMLFile.trimComment(comment),
                 datatype: this.type.datatype,
                 index: this.resourceIndex++,
-                context: QMLFile.makeContextValue(this.pathName)
+                context: paramContext || QMLFile.makeContextValue(this.pathName)
             };
             var r = this.API.newResource(params);
             this.set.add(r);
