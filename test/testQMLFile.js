@@ -372,7 +372,7 @@ module.exports.qmlfile = {
         test.done();
     },
     testQMLFileParseWithqtTranslateWithdisambiguationwithSingleQuote: function(test) {
-        test.expect(5);
+        test.expect(6);
 
         var qf = new QMLFile({
             project: p,
@@ -390,11 +390,11 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "This function is not available.");
         test.equal(r.getKey(), "disambiguation text");
-
+        test.equal(r.getContext(), "appLaunch");
         test.done();
     },
     testQMLFileParseWithqtTranslate: function(test) {
-        test.expect(5);
+        test.expect(6);
 
         var qf = new QMLFile({
             project: p,
@@ -412,11 +412,11 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "This function is not available.");
         test.equal(r.getKey(), "This function is not available.");
-
+        test.equal(r.getContext(), "appLaunch");
         test.done();
     },
     testQMLFileParseWithqtTranslatewithSingleQuote: function(test) {
-        test.expect(5);
+        test.expect(6);
 
         var qf = new QMLFile({
             project: p,
@@ -434,7 +434,7 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "This function is not available.");
         test.equal(r.getKey(), "This function is not available.");
-
+        test.equal(r.getContext(), "appLaunch");
         test.done();
     },
     testQMLFileParseSimpleWithTranslatorComment: function(test) {
@@ -842,7 +842,7 @@ module.exports.qmlfile = {
         test.done();
     },
     testQMLFileExtractFile: function(test) {
-        test.expect(8);
+        test.expect(10);
 
         var qf = new QMLFile({
             project: p,
@@ -861,6 +861,7 @@ module.exports.qmlfile = {
 
         test.equal(r.getSource(), "Invalid Format");
         test.equal(r.getKey(), "Invalid Format");
+        test.equal(r.getContext(), "t1");
 
         var sourceHash = utils.hashKey("(1) Please check the power of the external devices and cable connection status.");
         var r = set.get(SourceContextResourceString.hashKey("app", "t1", set.sourceLocale, "(1) Please check the power of the external devices and cable connection status.", "x-qml", undefined, sourceHash));
@@ -868,7 +869,7 @@ module.exports.qmlfile = {
  
         test.equal(r.getSource(), "(1) Please check the power of the external devices and cable connection status.");
         test.equal(r.getKey(), "(1) Please check the power of the external devices and cable connection status.");
-
+        test.equal(r.getContext(), "t1");
         test.done();
     },
     testQMLFileExtractUndefinedFile: function(test) {
@@ -1342,7 +1343,7 @@ module.exports.qmlfile = {
         test.done();
     },
     testQMLFileTest6: function(test) {
-        test.expect(20);
+        test.expect(26);
 
         var qf = new QMLFile({
             project: p,
@@ -1361,37 +1362,42 @@ module.exports.qmlfile = {
         test.ok(r);
         test.equal(r.getSource(), "Minimum");
         test.equal(r.getKey(), "energy");
+        test.equal(r.getContext(), "t6");
 
         var sourceHash = utils.hashKey("Maximum");
         var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "energy", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "Maximum");
         test.equal(r.getKey(), "energy");
+        test.equal(r.getContext(), "t6");
 
         var sourceHash = utils.hashKey("Don\'t save");
         var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "Don\'t save", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "Don't save");
         test.equal(r.getKey(), "Don't save");
+        test.equal(r.getContext(), "t6");
 
         var sourceHash = utils.hashKey("\'hello\' there");
         var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "\'hello\' there", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "'hello' there");
         test.equal(r.getKey(), "'hello' there");
+        test.equal(r.getContext(), "t6");
 
         var sourceHash = utils.hashKey("This function is not supported.");
         var r = set.get(SourceContextResourceString.hashKey("app", "appLaunch", set.sourceLocale, "This function is not supported.", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "This function is not supported.");
         test.equal(r.getKey(), "This function is not supported.");
-
+        test.equal(r.getContext(), "appLaunch");
         var sourceHash = utils.hashKey("Average");
+
         var r = set.get(SourceContextResourceString.hashKey("app", "appLaunch", set.sourceLocale, "energy", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "Average");
         test.equal(r.getKey(), "energy");
-
+        test.equal(r.getContext(), "appLaunch");
         test.done();
     },
     testQMLFileTest7: function(test) {
