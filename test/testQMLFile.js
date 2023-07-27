@@ -1283,7 +1283,7 @@ module.exports.qmlfile = {
             targetLocale: "zxx-Cyrl-XX"
         });
         var rs2 = r.generatePseudo("zxx-Cyrl-XX", rb);
-        test.equal(rs2.getTarget(),"Инвалид Формат6543210");
+        test.equal(rs2.getTarget(),"[Инвалид Формат6543210]");
         test.done();
     },
     testQMLPseudoLocalization3: function(test) {
@@ -1311,7 +1311,7 @@ module.exports.qmlfile = {
             targetLocale: "zxx-Hebr-XX"
         });
         var rs2 = r.generatePseudo("zxx-Hebr-XX", rb);
-        test.equal(rs2.getTarget(), 'ִנבַלִד פֹרמַט6543210');
+        test.equal(rs2.getTarget(), 'ִ[נבַלִד פֹרמַט6543210]');
         test.done();
     },
     testQMLPseudoLocalization4: function(test) {
@@ -1339,7 +1339,7 @@ module.exports.qmlfile = {
             targetLocale: "zxx-Hans-XX"
         });
         var rs2 = r.generatePseudo("zxx-Hans-XX", rb);
-        test.equal(rs2.getTarget(),"意尼於阿了意的凡夥熱们阿推6543210");
+        test.equal(rs2.getTarget(),"[意尼於阿了意的凡夥熱们阿推6543210]");
         test.done();
     },
     testQMLFileTest6: function(test) {
