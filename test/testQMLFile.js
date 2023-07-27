@@ -1255,7 +1255,7 @@ module.exports.qmlfile = {
             type: "text"
         });
         var rs2 = r.generatePseudo("zxx-XX", rb);
-        test.equal(rs2.getTarget(),"Ïñvàľíð Fõŕmàţ6543210");
+        test.equal(rs2.getTarget(), '[Ïñvàľíð Fõŕmàţ6543210]');
         test.done();
     },
     testQMLPseudoLocalization2: function(test) {
@@ -1311,7 +1311,7 @@ module.exports.qmlfile = {
             targetLocale: "zxx-Hebr-XX"
         });
         var rs2 = r.generatePseudo("zxx-Hebr-XX", rb);
-        test.equal(rs2.getTarget(), 'ִ[נבַלִד פֹרמַט6543210]');
+        test.equal(rs2.getTarget(), '[ִנבַלִד פֹרמַט6543210]');
         test.done();
     },
     testQMLPseudoLocalization4: function(test) {
