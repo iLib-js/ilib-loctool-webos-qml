@@ -99,7 +99,7 @@ QMLFileType.prototype._addResource = function(resFileType, translated, res, loca
     resource.project = res.getProject();
     resource.datatype = res.getDataType();
     resource.pathName = res.getPath();
-    resource.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
+    resource.context = res.getContext() || res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
     resource.setTargetLocale(locale);
     file = resFileType.getResourceFile(locale);
     file.addResource(resource);
@@ -234,7 +234,7 @@ QMLFileType.prototype.write = function(translations, locales) {
 
                         // To keep the extracted source's filename.  If not, xliff file name will be wrote to ts resource file.
                         storeResource.pathName = res.getPath();
-                        storeResource.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
+                        storeResource.context = res.getContext() || res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
 
                         file = resFileType.getResourceFile(locale);
                         file.addResource(storeResource);
@@ -267,7 +267,7 @@ QMLFileType.prototype.write = function(translations, locales) {
 
                             // To keep the extracted source's filename.  If not, xliff file name will be wrote to ts resource file.
                             storeResource.pathName = res.getPath();
-                            storeResource.context = res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
+                            storeResource.context = res.getContext() || res.getPath().replace(/^.*[\\\/]/, '').replace(/\.(qml|js)/, "");
 
                             file = resFileType.getResourceFile(locale);
                             file.addResource(storeResource);

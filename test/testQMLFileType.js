@@ -40,7 +40,6 @@ module.exports.qmlfiletype = {
         test.ok(cft);
         test.done();
     },
-
     testQMLFileTypeHandlesQMLFileTrue: function(test) {
         test.expect(2);
 
@@ -73,7 +72,6 @@ module.exports.qmlfiletype = {
         test.ok(cft.handles("foo/bar.js"));
         test.done();
     },
-
     testQMLFileTypeHandlesJSXFalse: function(test) {
         test.expect(2);
 
@@ -90,7 +88,6 @@ module.exports.qmlfiletype = {
         test.ok(!cft.handles("foo.cpp"));
         test.done();
     },
-
     testQMLFileTypeHandlesFalseClose: function(test) {
         test.expect(2);
 

@@ -51,7 +51,6 @@ module.exports.qmlfile = {
         test.ok(qf);
         test.done();
     },
-
     testQMLFileConstructorParams: function(test) {
         test.expect(1);
 
@@ -64,7 +63,6 @@ module.exports.qmlfile = {
         test.ok(qf);
         test.done();
     },
-
     testQMLFileConstructorNoFile: function(test) {
         test.expect(1);
 
@@ -76,7 +74,6 @@ module.exports.qmlfile = {
         test.ok(qf);
         test.done();
     },
-
     testQMLFileMakeKey: function(test) {
         test.expect(2);
 
@@ -89,7 +86,6 @@ module.exports.qmlfile = {
         test.equal(qf.makeKey("This is a test"), "This is a test");
         test.done();
     },
-
     testQMLFileMakeKey2: function(test) {
         test.expect(2);
 
@@ -102,7 +98,6 @@ module.exports.qmlfile = {
         test.equal(qf.makeKey("This is a \"real\" test"), "This is a \"real\" test");
         test.done();
     },
-
     testQMLFileMakeKeyWithSpace: function(test) {
         test.expect(2);
 
@@ -115,7 +110,6 @@ module.exports.qmlfile = {
         test.equal(qf.makeKey(" This is a test "), " This is a test ");
         test.done();
     },
-
     testQMLFileMakeKeyWithSpaces: function(test) {
         test.expect(2);
 
@@ -128,7 +122,6 @@ module.exports.qmlfile = {
         test.equal(qf.makeKey("   This is a test   "), "   This is a test   ");
         test.done();
     },
-
     testQMLFileParseSimpleGetByKey: function(test) {
         test.expect(5);
 
@@ -179,7 +172,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimpleGetBySource: function(test) {
         test.expect(5);
 
@@ -202,7 +194,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimpleGetBySourceWithSpace: function(test) {
         test.expect(5);
 
@@ -225,7 +216,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimpleGetBySourceWithSpaces: function(test) {
         test.expect(5);
 
@@ -248,7 +238,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimple: function(test) {
         test.expect(5);
 
@@ -271,7 +260,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimple2: function(test) {
         test.expect(5);
 
@@ -294,7 +282,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimple3: function(test) {
         test.expect(5);
 
@@ -317,7 +304,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseWithdisambiguation: function(test) {
         test.expect(5);
 
@@ -340,7 +326,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseWithdisambiguationwithSingleQuote: function(test) {
         test.expect(5);
 
@@ -363,9 +348,8 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseWithqtTranslateWithdisambiguation: function(test) {
-        test.expect(5);
+        test.expect(6);
 
         var qf = new QMLFile({
             project: p,
@@ -379,16 +363,16 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.ok(set);
 
-        var r = set.getBySource("This function is not available.");
+        var r = set.getBySource("This function is not available.", "appLaunch");
         test.ok(r);
         test.equal(r.getSource(), "This function is not available.");
         test.equal(r.getKey(), "disambiguation text");
+        test.equal(r.getContext(), "appLaunch");
 
         test.done();
     },
-
     testQMLFileParseWithqtTranslateWithdisambiguationwithSingleQuote: function(test) {
-        test.expect(5);
+        test.expect(6);
 
         var qf = new QMLFile({
             project: p,
@@ -402,16 +386,15 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.ok(set);
 
-        var r = set.getBySource("This function is not available.");
+        var r = set.getBySource("This function is not available.", "appLaunch");
         test.ok(r);
         test.equal(r.getSource(), "This function is not available.");
         test.equal(r.getKey(), "disambiguation text");
-
+        test.equal(r.getContext(), "appLaunch");
         test.done();
     },
-
     testQMLFileParseWithqtTranslate: function(test) {
-        test.expect(5);
+        test.expect(6);
 
         var qf = new QMLFile({
             project: p,
@@ -425,16 +408,15 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.ok(set);
 
-        var r = set.getBySource("This function is not available.");
+        var r = set.getBySource("This function is not available.", "appLaunch");
         test.ok(r);
         test.equal(r.getSource(), "This function is not available.");
         test.equal(r.getKey(), "This function is not available.");
-
+        test.equal(r.getContext(), "appLaunch");
         test.done();
     },
-
     testQMLFileParseWithqtTranslatewithSingleQuote: function(test) {
-        test.expect(5);
+        test.expect(6);
 
         var qf = new QMLFile({
             project: p,
@@ -448,14 +430,13 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.ok(set);
 
-        var r = set.getBySource("This function is not available.");
+        var r = set.getBySource("This function is not available.", "appLaunch");
         test.ok(r);
         test.equal(r.getSource(), "This function is not available.");
         test.equal(r.getKey(), "This function is not available.");
-
+        test.equal(r.getContext(), "appLaunch");
         test.done();
     },
-
     testQMLFileParseSimpleWithTranslatorComment: function(test) {
         test.expect(6);
 
@@ -479,7 +460,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimpleWithTranslatorComment2: function(test) {
         test.expect(6);
 
@@ -506,7 +486,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimpleWithTranslatorComment3: function(test) {
         test.expect(6);
 
@@ -534,7 +513,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimpleWithTranslatorComment4: function(test) {
         test.expect(6);
 
@@ -558,7 +536,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimpleWithTranslatorComment5: function(test) {
         test.expect(6);
 
@@ -585,7 +562,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimpleWithTranslatorComment6: function(test) {
         test.expect(6);
 
@@ -604,7 +580,7 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.ok(set);
 
-        var r = set.getBySource("My Channels\n \t ...");
+        var r = set.getBySource("My Channels\n \t ...", "context");
         test.ok(r);
         test.equal(r.getSource(), "My Channels\n \t ...");
         test.equal(r.getKey(), "number");
@@ -612,7 +588,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseSimpleWithTranslatorComment7: function(test) {
         test.expect(5);
 
@@ -632,14 +607,13 @@ module.exports.qmlfile = {
         var set = qf.getTranslationSet();
         test.ok(set);
 
-        var r = set.getBySource("My Channels\n \t ...");
+        var r = set.getBySource("My Channels\n \t ...", "context");
         test.ok(r);
         test.equal(r.getSource(), "My Channels\n \t ...");
         test.equal(r.getComment(), "comment3");
 
         test.done();
     },
-
     testQMLFileParseMultiple: function(test) {
         test.expect(8);
 
@@ -667,7 +641,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseMultiple2: function(test) {
         test.expect(8);
 
@@ -695,7 +668,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseMultiple3: function(test) {
         test.expect(17);
 
@@ -739,7 +711,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseBogusNonStringParam: function(test) {
         test.expect(2);
 
@@ -757,7 +728,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseEmptyParams: function(test) {
         test.expect(2);
 
@@ -775,7 +745,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseWholeWord: function(test) {
         test.expect(2);
 
@@ -793,7 +762,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParsePunctuationBeforeRB: function(test) {
         test.expect(15);
 
@@ -846,7 +814,6 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileParseMultilineComment: function(test) {
         test.expect(7);
 
@@ -874,9 +841,8 @@ module.exports.qmlfile = {
 
         test.done();
     },
-
     testQMLFileExtractFile: function(test) {
-        test.expect(8);
+        test.expect(10);
 
         var qf = new QMLFile({
             project: p,
@@ -895,6 +861,7 @@ module.exports.qmlfile = {
 
         test.equal(r.getSource(), "Invalid Format");
         test.equal(r.getKey(), "Invalid Format");
+        test.equal(r.getContext(), "t1");
 
         var sourceHash = utils.hashKey("(1) Please check the power of the external devices and cable connection status.");
         var r = set.get(SourceContextResourceString.hashKey("app", "t1", set.sourceLocale, "(1) Please check the power of the external devices and cable connection status.", "x-qml", undefined, sourceHash));
@@ -902,10 +869,9 @@ module.exports.qmlfile = {
  
         test.equal(r.getSource(), "(1) Please check the power of the external devices and cable connection status.");
         test.equal(r.getKey(), "(1) Please check the power of the external devices and cable connection status.");
-
+        test.equal(r.getContext(), "t1");
         test.done();
     },
-
     testQMLFileExtractUndefinedFile: function(test) {
         test.expect(2);
 
@@ -986,56 +952,56 @@ module.exports.qmlfile = {
         test.equal(r.getKey(), "8: disambiguation string");
 
         sourceHash = utils.hashKey("9: Test String for qsTranslate");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t2", set.sourceLocale, "9: Test String for qsTranslate", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "9: Test String for qsTranslate", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "9: Test String for qsTranslate");
         test.equal(r.getKey(), "9: Test String for qsTranslate");
 
         sourceHash = utils.hashKey("10: Test String for qsTranslateNoOp");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t2", set.sourceLocale, "10: Test String for qsTranslateNoOp", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "10: Test String for qsTranslateNoOp", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "10: Test String for qsTranslateNoOp");
         test.equal(r.getKey(), "10: Test String for qsTranslateNoOp");
         test.equal(r.getComment(), "translation comment for webOS,");
 
         sourceHash = utils.hashKey("11: Test String for QT_TRANSLATE_NOOP");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t2", set.sourceLocale, "11: Test String for QT_TRANSLATE_NOOP", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "11: Test String for QT_TRANSLATE_NOOP", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "11: Test String for QT_TRANSLATE_NOOP");
         test.equal(r.getKey(), "11: Test String for QT_TRANSLATE_NOOP");
 
         sourceHash = utils.hashKey("12: Test String for QT_TRANSLATE_NOOP3");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t2", set.sourceLocale, "12: Test String for QT_TRANSLATE_NOOP3", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "12: Test String for QT_TRANSLATE_NOOP3", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "12: Test String for QT_TRANSLATE_NOOP3");
         test.equal(r.getKey(), "12: Test String for QT_TRANSLATE_NOOP3");
 
         sourceHash = utils.hashKey("13: Test String for QT_TRANSLATE_N_NOOP");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t2", set.sourceLocale, "13: Test String for QT_TRANSLATE_N_NOOP", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "13: Test String for QT_TRANSLATE_N_NOOP", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "13: Test String for QT_TRANSLATE_N_NOOP");
         test.equal(r.getKey(), "13: Test String for QT_TRANSLATE_N_NOOP");
 
         sourceHash = utils.hashKey("14: Test String for qsTranslate with disambiguation");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t2", set.sourceLocale, "14: disambiguation string", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "14: disambiguation string", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "14: Test String for qsTranslate with disambiguation");
         test.equal(r.getKey(), "14: disambiguation string");
 
         sourceHash = utils.hashKey("15: Test String for qsTranslateNoOp with disambiguation");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t2", set.sourceLocale, "15: disambiguation string", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "15: disambiguation string", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "15: Test String for qsTranslateNoOp with disambiguation");
         test.equal(r.getKey(), "15: disambiguation string");
 
         sourceHash = utils.hashKey("16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t2", set.sourceLocale, "16: disambiguation string", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "16: disambiguation string", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
         test.equal(r.getKey(), "16: disambiguation string");
 
         sourceHash = utils.hashKey("17: single-quote string test");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t2", set.sourceLocale, "17: single-quote string test", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "17: single-quote string test", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "17: single-quote string test");
         test.equal(r.getKey(), "17: single-quote string test");
@@ -1215,49 +1181,49 @@ module.exports.qmlfile = {
         test.equal(r.getKey(), "8: disambiguation string");
 
         sourceHash = utils.hashKey("9: Test String for qsTranslate");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t5", set.sourceLocale, "9: Test String for qsTranslate", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "9: Test String for qsTranslate", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "9: Test String for qsTranslate");
         test.equal(r.getKey(), "9: Test String for qsTranslate");
 
         sourceHash = utils.hashKey("10: Test String for qsTranslateNoOp");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t5", set.sourceLocale, "10: Test String for qsTranslateNoOp", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "10: Test String for qsTranslateNoOp", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "10: Test String for qsTranslateNoOp");
         test.equal(r.getKey(), "10: Test String for qsTranslateNoOp");
 
         sourceHash = utils.hashKey("11: Test String for QT_TRANSLATE_NOOP");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t5", set.sourceLocale, "11: Test String for QT_TRANSLATE_NOOP", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "11: Test String for QT_TRANSLATE_NOOP", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "11: Test String for QT_TRANSLATE_NOOP");
         test.equal(r.getKey(), "11: Test String for QT_TRANSLATE_NOOP");
 
         sourceHash = utils.hashKey("12: Test String for QT_TRANSLATE_NOOP3");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t5", set.sourceLocale, "12: Test String for QT_TRANSLATE_NOOP3", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "12: Test String for QT_TRANSLATE_NOOP3", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "12: Test String for QT_TRANSLATE_NOOP3");
         test.equal(r.getKey(), "12: Test String for QT_TRANSLATE_NOOP3");
 
         sourceHash = utils.hashKey("13: Test String for QT_TRANSLATE_N_NOOP");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t5", set.sourceLocale, "13: Test String for QT_TRANSLATE_N_NOOP", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "13: Test String for QT_TRANSLATE_N_NOOP", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "13: Test String for QT_TRANSLATE_N_NOOP");
         test.equal(r.getKey(), "13: Test String for QT_TRANSLATE_N_NOOP");
 
         sourceHash = utils.hashKey("14: Test String for qsTranslate with disambiguation");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t5", set.sourceLocale, "14: disambiguation string", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "14: disambiguation string", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "14: Test String for qsTranslate with disambiguation");
         test.equal(r.getKey(), "14: disambiguation string");
 
         sourceHash = utils.hashKey("15: Test String for qsTranslateNoOp with disambiguation");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t5", set.sourceLocale, "15: disambiguation string", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "15: disambiguation string", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "15: Test String for qsTranslateNoOp with disambiguation");
         test.equal(r.getKey(), "15: disambiguation string");
 
         sourceHash = utils.hashKey("16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
-        var r = set.get(SourceContextResourceString.hashKey("app", "t5", set.sourceLocale, "16: disambiguation string", "x-qml", undefined, sourceHash));
+        var r = set.get(SourceContextResourceString.hashKey("app", "context", set.sourceLocale, "16: disambiguation string", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "16: Test String for QT_TRANSLATE_NOOP3 with disambiguation");
         test.equal(r.getKey(), "16: disambiguation string");
@@ -1289,7 +1255,7 @@ module.exports.qmlfile = {
             type: "text"
         });
         var rs2 = r.generatePseudo("zxx-XX", rb);
-        test.equal(rs2.getTarget(),"Ïñvàľíð Fõŕmàţ6543210");
+        test.equal(rs2.getTarget(), '[Ïñvàľíð Fõŕmàţ6543210]');
         test.done();
     },
     testQMLPseudoLocalization2: function(test) {
@@ -1317,7 +1283,7 @@ module.exports.qmlfile = {
             targetLocale: "zxx-Cyrl-XX"
         });
         var rs2 = r.generatePseudo("zxx-Cyrl-XX", rb);
-        test.equal(rs2.getTarget(),"Инвалид Формат6543210");
+        test.equal(rs2.getTarget(),"[Инвалид Формат6543210]");
         test.done();
     },
     testQMLPseudoLocalization3: function(test) {
@@ -1345,7 +1311,7 @@ module.exports.qmlfile = {
             targetLocale: "zxx-Hebr-XX"
         });
         var rs2 = r.generatePseudo("zxx-Hebr-XX", rb);
-        test.equal(rs2.getTarget(), 'ִנבַלִד פֹרמַט6543210');
+        test.equal(rs2.getTarget(), '[ִנבַלִד פֹרמַט6543210]');
         test.done();
     },
     testQMLPseudoLocalization4: function(test) {
@@ -1373,11 +1339,11 @@ module.exports.qmlfile = {
             targetLocale: "zxx-Hans-XX"
         });
         var rs2 = r.generatePseudo("zxx-Hans-XX", rb);
-        test.equal(rs2.getTarget(),"意尼於阿了意的凡夥熱们阿推6543210");
+        test.equal(rs2.getTarget(),"[意尼於阿了意的凡夥熱们阿推6543210]");
         test.done();
     },
     testQMLFileTest6: function(test) {
-        test.expect(14);
+        test.expect(26);
 
         var qf = new QMLFile({
             project: p,
@@ -1389,32 +1355,49 @@ module.exports.qmlfile = {
         qf.extract();
 
         var set = qf.getTranslationSet();
-        test.equal(set.size(), 4);
+        test.equal(set.size(), 6);
 
         var sourceHash = utils.hashKey("Minimum");
         var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "energy", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "Minimum");
         test.equal(r.getKey(), "energy");
+        test.equal(r.getContext(), "t6");
 
         var sourceHash = utils.hashKey("Maximum");
         var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "energy", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "Maximum");
         test.equal(r.getKey(), "energy");
+        test.equal(r.getContext(), "t6");
 
         var sourceHash = utils.hashKey("Don\'t save");
         var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "Don\'t save", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "Don't save");
         test.equal(r.getKey(), "Don't save");
+        test.equal(r.getContext(), "t6");
 
         var sourceHash = utils.hashKey("\'hello\' there");
         var r = set.get(SourceContextResourceString.hashKey("app", "t6", set.sourceLocale, "\'hello\' there", "x-qml", undefined, sourceHash));
         test.ok(r);
         test.equal(r.getSource(), "'hello' there");
         test.equal(r.getKey(), "'hello' there");
+        test.equal(r.getContext(), "t6");
 
+        var sourceHash = utils.hashKey("This function is not supported.");
+        var r = set.get(SourceContextResourceString.hashKey("app", "appLaunch", set.sourceLocale, "This function is not supported.", "x-qml", undefined, sourceHash));
+        test.ok(r);
+        test.equal(r.getSource(), "This function is not supported.");
+        test.equal(r.getKey(), "This function is not supported.");
+        test.equal(r.getContext(), "appLaunch");
+        var sourceHash = utils.hashKey("Average");
+
+        var r = set.get(SourceContextResourceString.hashKey("app", "appLaunch", set.sourceLocale, "energy", "x-qml", undefined, sourceHash));
+        test.ok(r);
+        test.equal(r.getSource(), "Average");
+        test.equal(r.getKey(), "energy");
+        test.equal(r.getContext(), "appLaunch");
         test.done();
     },
     testQMLFileTest7: function(test) {
