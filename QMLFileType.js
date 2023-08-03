@@ -277,10 +277,14 @@ QMLFileType.prototype.write = function(translations, locales) {
                 }.bind(this));
             }.bind(this));
         }
-
-    resources = this.pseudo.getAll().filter(function(resource) {
-        return resource.datatype === this.datatype;
-    }.bind(this));
+    resources = [];
+    var typeValue = this.type.replace("x-", "");
+    if (this.project.settings[typeValue] === undefined ||
+        (this.project.settings[typeValue] && !(this.project.settings[typeValue].disablePseudo === true))){
+        resources = this.pseudo.getAll().filter(function(resource) {
+            return resource.datatype === this.datatype;
+        }.bind(this));
+    }
 
     for (var i = 0; i < resources.length; i++) {
         res = resources[i];

@@ -3,7 +3,16 @@ ilib-webos-loctool-qml is a plugin for the loctool allows it to read and localiz
 
 ## Release Notes
 v1.7.0
+* Updated dependencies. (loctool: 2.22.0)
 * Update to use first argument of `qsTranslate()` as a context value instead of file name.
+* Added ability to disable pseudo-localization in plugin when a project's pseudo-localization is enabled.
+    ~~~~
+       "settings": {
+            "json": {
+                "disablePseudo": true
+            }
+        }
+    ~~~~
 
 v1.6.0
 * Updated dependencies. (loctool: 2.21.0)
