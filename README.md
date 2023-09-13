@@ -2,11 +2,11 @@
 ilib-webos-loctool-qml is a plugin for the loctool allows it to read and localize qml files. This plugins is optimized for webOS platform.
 
 ### QML FileType
-This plugin expects the strings are marekd by using proper APIs from QT suggested.
+This plugin expects the strings to be marked by using proper APIs from QT suggested.
  - [qsTr()](https://doc.qt.io/qt-6/qml-qtqml-qt.html#qsTr-method)
- - [qsTranslate()]()
+ - [qsTranslate()](https://doc.qt.io/qt-6/qml-qtqml-qt.html#qsTranslate-method)
  - [qsTrId](https://doc.qt.io/qt-6/qml-qtqml-qt.html#qsTrId-method)
- - [qsTrIdNoOp](https://doc.qt.io/qt-6/qml-qtqml-qt.html#qsTrIdNoOp-method),
+ - [qsTrIdNoOp](https://doc.qt.io/qt-6/qml-qtqml-qt.html#qsTrIdNoOp-method)
  - [qsTrNoOp](https://doc.qt.io/qt-6/qml-qtqml-qt.html#qsTrNoOp-method)
  - [qsTranslate](https://doc.qt.io/qt-6/qml-qtqml-qt.html#qsTranslate-method)
  - [qsTranslateNoOp](https://doc.qt.io/qt-6/qml-qtqml-qt.html#qsTranslateNoOp-method)
@@ -65,7 +65,7 @@ file for more details.
 ### v1.4.0
 * Updated dependencies. (loctool: 2.20.0)
 * Added ability to define custom locale inheritance.
-  * i.e) en-AU inherits translations from en-GB
+  * e.g. en-AU inherits translations from en-GB
     ~~~~
        "settings": {
             "localeInherit": {
