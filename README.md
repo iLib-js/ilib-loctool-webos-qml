@@ -36,11 +36,11 @@ file for more details.
 
 ### v1.7.1
 * Updated dependencies. (loctool: 2.23.1)
-* Update to be included `npm-shrinkwrap.json` in the published files.
+* Updated to be included `npm-shrinkwrap.json` in the published files.
 
 ### v1.7.0
 * Updated dependencies. (loctool: 2.22.0)
-* Update to use first argument of `qsTranslate()` as a context value instead of file name.
+* Updated to use first argument of `qsTranslate()` as a context value instead of file name.
 * Added ability to disable pseudo-localization in plugin when a project's pseudo-localization is enabled.
     ~~~~
        "settings": {
