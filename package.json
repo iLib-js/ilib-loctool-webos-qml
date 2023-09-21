@@ -1,6 +1,6 @@
 {
     "name": "ilib-loctool-webos-qml",
-    "version": "1.7.2",
+    "version": "1.7.3",
     "main": "./QMLFileType.js",
     "description": "A loctool plugin that knows how to process qml files",
     "license": "Apache-2.0",
@@ -31,8 +31,7 @@
         "README.md",
         "LICENSE",
         "QMLFileType.js",
-        "QMLFile.js",
-        "npm-shrinkwrap.json"
+        "QMLFile.js"
     ],
     "repository": {
         "type": "git",
@@ -48,7 +47,7 @@
         "node": ">=10.0.0"
     },
     "dependencies": {
-        "ilib-loctool-webos-ts-resource": "1.5.2"
+        "ilib-loctool-webos-ts-resource": "1.5.3"
     },
     "peerDependencies": {
         "loctool": "2.23.1"

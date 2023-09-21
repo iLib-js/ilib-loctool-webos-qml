@@ -28,16 +28,19 @@ This plugin is license under Apache2. See the [LICENSE](./LICENSE)
 file for more details.
 
 ## Release Notes
+### v1.7.3
+* Removed `npm-shrinkwrap.json`. It takes a bigger memory size than I expected on webOS. so I decided not to maintain the file here.
+
 ### v1.7.2
 * Added `loctool` package to `peerDependencies` in `package.json`.
 
 ### v1.7.1
 * Updated dependencies. (loctool: 2.23.1)
-* Update to be included `npm-shrinkwrap.json` in the published files.
+* Updated to be included `npm-shrinkwrap.json` in the published files.
 
 ### v1.7.0
 * Updated dependencies. (loctool: 2.22.0)
-* Update to use first argument of `qsTranslate()` as a context value instead of file name.
+* Updated to use first argument of `qsTranslate()` as a context value instead of file name.
 * Added ability to disable pseudo-localization in plugin when a project's pseudo-localization is enabled.
     ~~~~
        "settings": {
