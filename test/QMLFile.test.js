@@ -17,7 +17,6 @@
  * limitations under the License.
  */
 
-const ContextResourceString = require("loctool/lib/ContextResourceString.js");
 var path = require("path");
 
 if (!QMLFile) {
