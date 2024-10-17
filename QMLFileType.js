@@ -105,6 +105,33 @@ QMLFileType.prototype._addResource = function(resFileType, translated, res, loca
     file.addResource(resource);
 }
 
+QMLFileType.prototype._getTranslationWithNewline = function(db, translated, res, locale, isCommon) {
+    var newtranslated = translated;
+
+    var newlinerestored = res.getSource().replace(/\n/g, "\\n");
+    this.logger.debug("_getTranslationWithNewline: "+newlinerestored);
+    var newres = res.clone();
+    newres.source = newlinerestored;
+    newres.sourcehash = this.API.utils.hashKey(newlinerestored);
+    var manipulateKey;
+    if (isCommon) {
+        manipulateKey = ResourceString.hashKey(this.commonPrjName, locale, res.getKey().replace(/\n/g, "\\n"), this.commonPrjType, res.getFlavor());
+    }
+    else {
+        manipulateKey = newres.cleanHashKeyForTranslation(locale).replace(newres.getContext(), "").replace(/\n/g, "\\n");
+    }
+    db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
+        if (translated) {
+            translated.source = res.source;
+            translated.reskey = res.reskey;
+            translated.setTarget(translated.getTarget().replace(/\\n/g, "\n"));
+            newtranslated = translated;
+        }
+    }.bind(this));
+
+    return newtranslated;
+}
+
 /**
  * Write out the aggregated resources for this file type. In
  * some cases, the string are written out to a common resource
@@ -157,17 +184,37 @@ QMLFileType.prototype.write = function(translations, locales) {
                     db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
                     var r = translated;
 
+                    if (!translated && res.getSource().includes("\n")) {
+                        translated = this._getTranslationWithNewline(db, translated, res, locale, false);
+                        r = translated;
+                    }
+
                     if (!translated && this.isloadCommonData) {
                         var manipulateKey = ResourceString.hashKey(this.commonPrjName, locale, res.getKey(), this.commonPrjType, res.getFlavor());
                         db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
+                            if (!translated && res.getSource().includes("\n")) {
+                                translated = this._getTranslationWithNewline(db, translated, res, locale, true);
+                                r = translated;
+                            }
+
                             if (translated) {
                                 this._addResource(resFileType, translated, res, locale);
                             } else if(!translated && customInheritLocale){
                                 var manipulateKey = res.cleanHashKeyForTranslation(customInheritLocale).replace(res.getContext(), "");
                                 db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
+                                    if (!translated && res.getSource().includes("\n")) {
+                                        translated = this._getTranslationWithNewline(db, translated, res, customInheritLocale, false);
+                                        r = translated;
+                                    }
+
                                     if (!translated){
                                         var manipulateKey = ResourceString.hashKey(this.commonPrjName, customInheritLocale, res.getKey(), this.commonPrjType, res.getFlavor());
                                         db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
+                                            if (!translated && res.getSource().includes("\n")) {
+                                                translated = this._getTranslationWithNewline(db, translated, res, customInheritLocale, true);
+                                                r = translated;
+                                            }
+
                                             if (translated){
                                                 this._addResource(resFileType, translated, res, locale);
                                             } else {
@@ -198,6 +245,11 @@ QMLFileType.prototype.write = function(translations, locales) {
                         var manipulateKey = res.cleanHashKeyForTranslation(customInheritLocale).replace(res.getContext(),"");
                         db.getResourceByCleanHashKey(manipulateKey, function(err, translated) {
                             var r = translated;
+                            if (!translated && res.getSource().includes("\n")) {
+                                translated = this._getTranslationWithNewline(db, translated, res, customInheritLocale, false);
+                                r = translated;
+                            }
+
                             if (translated){
                                 this._addResource(resFileType, translated, res, locale);
                             } else {

@@ -28,6 +28,9 @@ This plugin is license under Apache2. See the [LICENSE](./LICENSE)
 file for more details.
 
 ## Release Notes
+### v1.7.5
+* Fixed newline issues where resources of source string containing '\n' were not generated
+
 ### v1.7.4
 * Updated dependencies. (loctool: 2.24.0)
 * Converted all the unit tests from `nodeunit` to `jest`.
