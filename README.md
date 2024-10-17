@@ -29,7 +29,7 @@ file for more details.
 
 ## Release Notes
 ### v1.7.5
-* Fixed newline issues where source string containing '\n' were not extracted
+* Fixed newline issues where resources of source string containing '\n' were not generated
 
 ### v1.7.4
 * Updated dependencies. (loctool: 2.24.0)
